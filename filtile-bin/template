@@ -1,0 +1,19 @@
+pkgname=filtile-bin
+version=1.2.1
+revision=1
+archs="x86_64"
+depends=""
+short_desc="A layout manager for the River window manager."
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="GPL-3.0"
+homepage="https://github.com/pkulak/filtile"
+distfiles="https://github.com/pkulak/filtile/releases/download/v${version}/filtile-x86_64-unknown-linux-gnu.tar.gz"
+checksum=aa0b3e0dbb2126f44f153f2f6d1fd37f6961bf7153895aff50e3cc6bce191466
+
+do_install() {
+    vbindir=/usr/bin
+
+    mkdir -p "${DESTDIR}${vbindir}"
+
+    install -D -m755 filtile "${DESTDIR}${vbindir}/filtile"
+}
