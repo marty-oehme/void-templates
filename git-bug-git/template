@@ -1,0 +1,22 @@
+# Template file for 'git-bug-git'
+pkgname=git-bug-git
+version=20241209
+revision=1
+_commit=d499b6e9d3333334614924669b74640a2d0b5485
+build_style=go
+go_import_path="github.com/git-bug/git-bug"
+hostmakedepends="git"
+depends="git"
+short_desc="Distributed, offline-first bug tracker embedded in git, with bridges"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="GPL-3.0-only"
+homepage="https://github.com/git-bug/git-bug"
+distfiles="${homepage}/archive/${_commit}.tar.gz"
+replaces="git-bug>=0"
+provides="git-bug-${version}_${revision}"
+checksum=b62c4b8145babac282c61e5467b815321eb0008d92df37403ba388432aeca01b
+
+post_install() {
+    vlicense LICENSE
+    vdoc README.md
+}
