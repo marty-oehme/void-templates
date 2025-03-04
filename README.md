@@ -9,7 +9,15 @@ Use it at your own discretion but I make no promises toward any functionality, s
 
 ## ROADMAP
 
-### Templates
+### Current
+
+- [x] Create new builds for all contained packages
+- [x] Detect changed packages from previous builds
+- [x] build only for those packages
+- [ ] detect upstream changes and update templates
+- [ ] build for multiple (appropriate) arches
+
+### Ideas
 
 Goal: auto-update templates on remote updates (checked e.g. every 24h)
 
@@ -25,8 +33,6 @@ Goal: auto-update templates on remote updates (checked e.g. every 24h)
         - Can't do this here tbh since we need to compare the output of build operation for old and new
     - [ ] if checksum OK, automatically commit to `main` branch
 
-### Repo
-
 - [ ] on new `main` addition
 - [ ] complete builds
     - only build for new packages?
@@ -35,3 +41,27 @@ Goal: auto-update templates on remote updates (checked e.g. every 24h)
     - [ ] pull all existing packages in repo into dir
     - [ ] put new version of the package into repo
     - [ ] repush repo to page with new file
+
+## Package wishlist
+
+Packages I didn't find in repos:
+    - [ ] bemoji
+    - [ ] bugwarrior
+    - [ ] viddy
+    - [ ] netbird / protonvpn / piactl
+
+packages built xbps-src style:
+    - [x] filtile (/src instead of bin)
+    - [x] dotter (/src instead of bin)
+    - [x] git-bug (/src)
+    - [~] git-delta
+    - [ ] bugwarrior
+    - [ ] viddy
+    - [ ] netbird
+    - [ ] piactl/daemon
+        - https://github.com/pia-foss/desktop/issues/59
+
+- packages to investigate:
+    - [ ] impala (iwd TUI)
+    - [ ] localsend
+
