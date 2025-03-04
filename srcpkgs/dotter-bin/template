@@ -2,7 +2,7 @@
 pkgname=dotter-bin
 version=0.13.3
 revision=1
-archs="x86_64"
+archs="x86_64 x86_64-musl"
 hostmakedepends=""
 makedepends=""
 depends=""
