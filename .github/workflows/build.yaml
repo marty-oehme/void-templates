@@ -148,6 +148,13 @@ jobs:
           for pkg in *.xbps; do sha256sum "$pkg" | tee "$pkg".sha256sum; done
           for pkg in *.xbps; do sha512sum "$pkg" | tee "$pkg".sha512sum; done
 
+      - name: Create simple index page for repo
+        working-directory: hostdir/binpkgs/
+        run: |
+          echo '<html><head><title>Index of /</title></head> <body><h1>Index of /</h1><hr><pre>' > index.html
+          for pkg in *.xbps; do echo "<a href=\"${pkg}}\">${pkg}</a>" >> index.html; done
+          echo '</body></html>' >> index.html
+
       - name: publish to pages
         uses: peaceiris/actions-gh-pages@v4
         # If you're changing the branch from main,
