@@ -1,0 +1,19 @@
+# Template file for 'bemoji'
+pkgname=bemoji
+version=0.4.0
+revision=1
+depends="bash coreutils"
+short_desc="emoji picker that remembers your favorites"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="MIT"
+homepage="https://github.com/marty-oehme/bemoji"
+distfiles="https://github.com/marty-oehme/bemoji/releases/download/v/bemoji-${version}.tar.gz"
+checksum=af9fa6edf8aba8d239af7c3c50423182c713a899e2d81f834ef5b1197b4c7995
+
+do_install() {
+    vbin bemoji
+
+    vman doc/bemoji.1.gz
+    vlicense doc/LICENSE
+    vdoc doc/README.md
+}
