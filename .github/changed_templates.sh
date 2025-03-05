@@ -35,6 +35,11 @@ esac
 
 base="$(git merge-base origin/HEAD "$tip")"
 
+# simply get parent for direct master-commits
+if [ "$base" = "$tip" ]; then
+    base="$(git rev-list -1 "$tip"~1)"
+fi
+
 echo "$base $tip" >/tmp/revisions
 
 /bin/echo -e '\x1b[32mChanged packages:\x1b[0m'
