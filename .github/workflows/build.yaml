@@ -174,8 +174,6 @@ jobs:
 
       - name: sign
         run: |
-          xbps-rindex -r $PWD
-
           echo "${{ secrets.PRIV_KEY }}" > $HOME/privkey
           xbps-rindex -s --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD
           xbps-rindex -S --privkey $HOME/privkey $PWD/*.xbps
