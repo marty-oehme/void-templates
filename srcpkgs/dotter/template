@@ -1,0 +1,25 @@
+# Template file for 'dotter'
+pkgname=dotter
+version=0.13.3
+revision=1
+build_style=cargo
+hostmakedepends="rust"
+makedepends="rust-std which"
+short_desc="dotfile manager and templater written in rust"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="Unlicense"
+homepage="https://github.com/SuperCuber/dotter"
+distfiles="${homepage}/archive/v${version}.tar.gz"
+checksum=4ca78450414f405c892c26b1663cac6e56a86e1d04529a7b1a69b23881c38414
+
+post_install() {
+    vdoc  README.md
+    vlicense LICENSE.md
+
+    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell bash > completion.bash
+    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell zsh > completion.zsh
+    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell fish > completion.fish
+    vcompletion completion.bash bash
+    vcompletion completion.zsh zsh
+    vcompletion completion.fish fish
+}
