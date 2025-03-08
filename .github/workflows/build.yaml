@@ -156,14 +156,16 @@ jobs:
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
           # install dependencies
           xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash curl git git-lfs
-          # create non-root user
-          useradd -G xbuilder -M builder
 
       - name: Checkout existing repo
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           lfs: true
+
+      - name: Remove any non-repo files
+        run: |
+          xbps-rindex --remove $PWD
 
       - uses: actions/download-artifact@v4
         with:
@@ -172,24 +174,27 @@ jobs:
       - name: Show downloaded files
         run: ls -R .
 
-      - name: sign
+      - name: Sign package and repo
         run: |
           echo "${{ secrets.PRIV_KEY }}" > $HOME/privkey
           xbps-rindex -s --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD
-          xbps-rindex -S --privkey $HOME/privkey $PWD/*.xbps
+          xbps-rindex -S --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD/*.xbps
           rm $HOME/privkey
 
-          xbps-rindex -c $PWD
-
-      - name: checksum
+      - name: Add package to repo
         run: |
-          for pkg in *.xbps; do sha256sum "$pkg" | tee "$pkg".sha256sum; done
-          for pkg in *.xbps; do sha512sum "$pkg" | tee "$pkg".sha512sum; done
+          xbps-rindex --add $PWD/*.xbps
+          xbps-rindex --clean $PWD
+
+      # - name: checksum
+      #   run: |
+      #     for pkg in *.xbps; do sha256sum "$pkg" | tee "$pkg".sha256sum; done
+      #     for pkg in *.xbps; do sha512sum "$pkg" | tee "$pkg".sha512sum; done
 
       - name: Create simple index page for repo
         run: |
-          echo '<html><head><title>Index of /</title></head> <body><h1>Index of /</h1><hr><pre>' > index.html
-          for pkg in *.xbps; do echo "<a href=\"${pkg}}\">${pkg}</a>" >> index.html; done
+          echo '<html><head><title>Custom void repository</title></head> <body><h1>Custom void repository. Index of /</h1><hr><pre>' > index.html
+          for pkg in *.xbps *.xbps.sig2; do echo "<a href=\"${pkg}}\">${pkg}</a>" >> index.html; done
           echo '</body></html>' >> index.html
 
       - name: publish to pages
