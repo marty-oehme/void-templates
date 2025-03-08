@@ -1,0 +1,21 @@
+# Template file for 'ripgrep-all'
+pkgname=ripgrep-all
+version=0.10.6
+revision=1
+build_style=cargo
+hostmakedepends="rust pkg-config"
+makedepends="rust-std libzstd-devel sqlite-devel"
+checkdepends="poppler-utils pandoc"
+depends="ripgrep"
+#depends="pandoc ffmpeg unzip sqlite" optional dependencies for adapters
+short_desc="ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, etc"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="AGPL-3.0-only"
+homepage="https://github.com/phiresky/ripgrep-all"
+distfiles="${homepage}/archive/v${version}.tar.gz"
+checksum=06cd619ad6638be206266a77fdf11034dc2dc15d97b3a057b0d6280a17334680
+
+post_install() {
+    vdoc  README.md
+    vlicense LICENSE.md
+}
