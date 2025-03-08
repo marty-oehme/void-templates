@@ -23,7 +23,6 @@ jobs:
       - name: checkout local templates
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
           fetch-depth: 0
 
       - id: grabchanged
