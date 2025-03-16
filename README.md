@@ -11,6 +11,14 @@ Currently, files in the repository are _only_ built for x86_64.
 I would like to extend it to other arches at some point but it is not a priority for me,
 and I do not know enough about the xbps build system to make it easily possible.
 
+The repository can be added to xbps by adding the following to a file called (for example) `/etc/xbps.d/20-custom-repositories.conf`:
+
+```conf
+repository=https://marty-oehme.github.io/void-templates
+```
+
+Then all packages herein can be installed.
+
 ## ROADMAP
 
 - [x] Create new builds for all contained packages
