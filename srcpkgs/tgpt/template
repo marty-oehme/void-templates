@@ -1,0 +1,20 @@
+# Template file for 'tgpt'
+pkgname=tgpt
+version=2.9.1
+revision=1
+build_style=go
+go_import_path="github.com/aandrew-me/tgpt/v2"
+short_desc="AI Chatbots in terminal without needing API keys"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="GPL-3.0-only"
+homepage="https://github.com/aandrew-me/tgpt"
+distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
+checksum=05c2d2009789679fe1d744474783a853abc79d3dad6d14871402ee933397fe00
+
+do_check() { :; }
+
+post_install() {
+    vlicense LICENSE
+
+    vdoc README.md
+}

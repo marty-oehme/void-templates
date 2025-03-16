@@ -36,7 +36,7 @@ and I do not know enough about the xbps build system to make it easily possible.
 - [ ] tasklite
 - [ ] tu
 - [ ] <https://github.com/nushell/nufmt>
-- [ ] tgpt
+- [x] tgpt
 
 - [ ] impala (iwd TUI)
 - [ ] localsend:
