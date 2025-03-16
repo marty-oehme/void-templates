@@ -1,7 +1,7 @@
 # Template file for 'localsend-go'
 pkgname=localsend-go
 version=1.2.5
-revision=1
+revision=2
 build_style=go
 go_import_path="localsend_cli"
 go_package="./cmd"
@@ -30,6 +30,4 @@ post_install() {
     vdoc doc/README_en.md
     vdoc doc/README_jp.md
     vdoc doc/README_zh.md
-
-    setcap cap_net_raw=+ep /usr/bin/localsend-go
 }
