@@ -1,0 +1,35 @@
+# Template file for 'localsend-go'
+pkgname=localsend-go
+version=1.2.5
+revision=1
+build_style=go
+go_import_path="localsend_cli"
+go_package="./cmd"
+depends="libcap-progs"
+short_desc="CLI for localsend implemented in Go"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="MIT"
+homepage="https://github.com/meowrain/localsend-go"
+distfiles="${homepage}/archive/v${version}.tar.gz"
+checksum=48d6b94b7cbcf6b07400c7293401a0d329e15c6ab1f3493e31363a5525e73b00
+
+do_install() {
+    vbin ${GOPATH}/bin/cmd localsend_cli
+}
+
+# have to turn it off currently since
+# tui_test.go is trying to open a TTY which is not possible.
+# When it _does_ succeed it would just hang there anyway.
+do_check() {
+    :
+}
+
+post_install() {
+    vlicense LICENSE
+
+    vdoc doc/README_en.md
+    vdoc doc/README_jp.md
+    vdoc doc/README_zh.md
+
+    setcap cap_net_raw=+ep /usr/bin/localsend-go
+}
