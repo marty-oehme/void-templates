@@ -1,6 +1,6 @@
 # Template file for 'tgpt'
 pkgname=tgpt
-version=2.9.1
+version=2.9.2
 revision=1
 build_style=go
 go_import_path="github.com/aandrew-me/tgpt/v2"
@@ -9,7 +9,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/aandrew-me/tgpt"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum=05c2d2009789679fe1d744474783a853abc79d3dad6d14871402ee933397fe00
+checksum=8ad477e8089b2b2b98f8d0fc9dcf367f1ef12e2a0abf427151fb2adfe10ebb5a
 
 do_check() { :; }
 
