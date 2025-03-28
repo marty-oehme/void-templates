@@ -32,12 +32,13 @@ Then all packages herein can be installed.
 
 - [x] bemoji
 - [x] ripgrep-all
-- [x] filtile (/src instead of bin)
-- [x] dotter (/src instead of bin)
-- [x] git-bug (/src)
+- [x] filtile (bin build only)
+- [x] dotter
+- [x] git-bug
 - [ ] bugwarrior - only in pypi for now
 - [ ] viddy / hwatch
-- [ ] netbird / protonvpn / piactl
+- [x] netbird (bin build only. After install, enable service, then run 'netbird up')
+- [ ] protonvpn / piactl
   - <https://github.com/pia-foss/desktop/issues/59>
 - [ ] taskopen
 - [ ] dstask
