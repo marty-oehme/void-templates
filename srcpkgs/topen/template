@@ -1,0 +1,14 @@
+# Template file for 'topen'
+pkgname=topen
+version=0.1.0
+revision=1
+build_style=python3-pep517
+depends="python3-tasklib"
+hostmakedepends="python3-setuptools"
+short_desc="note editing for taskwarrior tasks"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="MIT"
+homepage="https://github.com/marty-oehme/topen"
+distfiles="${PYPI_SITE}/t/topen/topen-0.1.0.tar.gz"
+checksum=660b4b7c2aadbac9b17907380528d0549252a386c046fc3b4462c168a2f75329
+make_check=no # don't exec tests, we don't have any
