@@ -1,0 +1,80 @@
+name: update packages
+
+on:
+  pull_request:
+    paths:
+      - "srcpkgs/**"
+    types:
+      - opened
+      - reopened # TODO: For debugging purposes
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  checksum:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/void-linux/void-glibc-full:latest
+      options: --platform linux/amd64 --privileged
+      volumes:
+        - /dev:/dev
+      env:
+        ARCH: x86_64
+        BOOTSTRAP: x86_64
+        TEST: 1
+
+    steps:
+      - name: Prepare container
+        run: |
+          # switch to repo-ci mirror
+          mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
+          sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
+          # install dependencies
+          xbps-install -Suy xbps && xbps-install -Suy sudo xtools bash
+          # create non-root user
+          useradd -G xbuilder -M builder
+
+      - name: checkout local templates
+        uses: actions/checkout@v4
+
+      - name: remember changed package
+        run: |
+          echo "CHANGED_PKG=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
+
+      - name: checkout upstream templates
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          ref: master
+          fetch-depth: 1
+          path: upstream
+
+      - name: copy to upstream
+        run: cp -rv srcpkgs/* upstream/srcpkgs
+
+      - name: prep masterdir
+        run: |
+          cd upstream &&
+          chown -R builder:builder . &&
+          sudo -Eu builder common/travis/set_mirror.sh &&
+          sudo -Eu builder common/travis/prepare.sh &&
+          cd ..
+
+      - name: generate checksum
+        env:
+          CHANGED_PKG: ${{ needs.changedpkgs.outputs.changed }}
+        run: |
+          cd upstream &&
+          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }} &&
+          cd ..
+
+      - name: receive relevant copy from upstream
+        run: |
+          cp -r upstream/srcpkgs/${{ env.CHANGED_PKG }} srcpkgs
+
+      - name: Commit new checksum
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          file_pattern: "srcpkgs/${{ env.CHANGED_PKG }}/template"
+          commit_message: "Update ${{ env.CHANGED_PKG }} checksum"
