@@ -156,7 +156,7 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
-    if: "github.ref == 'refs/heads/main' && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
+    if: "github.ref == 'refs/heads/main' && ${{ github.event_name != 'workflow_run' }} && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
 
     container:
       image: ghcr.io/void-linux/void-glibc-full:20250227R1
