@@ -73,7 +73,7 @@ jobs:
         run: |
           cp -r "upstream/srcpkgs/${{ env.CHANGED_PKG }}" srcpkgs
 
-      - name: Commit new checksum
+      - name: commit new checksum
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           file_pattern: "srcpkgs/${{ env.CHANGED_PKG }}/template"
