@@ -1,4 +1,4 @@
-name: update packages
+name: PackageUpdate
 
 on:
   pull_request:
