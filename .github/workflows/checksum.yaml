@@ -31,7 +31,7 @@ jobs:
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
           # install dependencies
-          xbps-install -Suy xbps && xbps-install -Suy sudo xtools bash
+          xbps-install -Suy xbps && xbps-install -Suy sudo xtools bash git
           # create non-root user
           useradd -G xbuilder -M builder
 
@@ -43,7 +43,9 @@ jobs:
 
       - name: remember changed package
         run: |
+          git config --global --add safe.directory $PWD
           echo "CHANGED_PKG=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
+          echo "CHANGED: ${{ env.CHANGED_PKG }}"
 
       - name: checkout upstream templates
         uses: actions/checkout@v4
