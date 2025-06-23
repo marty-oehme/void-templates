@@ -1,6 +1,6 @@
 # Template file for 'ripgrep-all'
 pkgname=ripgrep-all
-version=0.10.6
+version=0.10.6 # renovate: datasource=github-tags depName=phiresky/ripgrep-all
 revision=2
 build_style=cargo
 hostmakedepends="rust pkg-config"
