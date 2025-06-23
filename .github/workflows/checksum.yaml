@@ -67,14 +67,11 @@ jobs:
 
       - name: generate checksum
         working-directory: upstream
-        env:
-          CHANGED_PKG: ${{ needs.changedpkgs.outputs.changed }}
-        run: |
-          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
+        run: "sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}"
 
       - name: receive relevant copy from upstream
         run: |
-          cp -r upstream/srcpkgs/${{ env.CHANGED_PKG }} srcpkgs
+          cp -r "upstream/srcpkgs/${{ env.CHANGED_PKG }}" srcpkgs
 
       - name: Commit new checksum
         uses: stefanzweifel/git-auto-commit-action@v6
