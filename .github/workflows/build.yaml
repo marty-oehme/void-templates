@@ -39,10 +39,18 @@ jobs:
           fetch-depth: 1
           path: distdir
 
+      - name: fetch xtools
+        if: ${{ env.CHANGED_PKG != '' }}
+        run: distdir/common/travis/fetch-xtools.sh
+
+      - name: copy packages to upstream srcpkgs
+        if: ${{ env.CHANGED_PKG != '' }}
+        run: cp -rv srcpkgs/* distdir/srcpkgs
+
       - name: generate checksum
         if: ${{ env.CHANGED_PKG != '' }}
         run: |
-          XBPS_DISTDIR="$PWD/distdir" xgensum -i ${{ env.CHANGED_PKG }}
+          XBPS_DISTDIR="$PWD/distdir" /tmp/bin/xgensum ${{ env.CHANGED_PKG }} | sed '/^=> /d' > srcpkgs/${{ env.CHANGED_PKG }}/template
 
       - name: Commit
         if: ${{ env.CHANGED_PKG != '' }}
