@@ -50,24 +50,22 @@ jobs:
           fetch-depth: 1
           path: upstream
 
+      - name: prep masterdir
+        working-directory: upstream
+        run: |
+          chown -R builder:builder . &&
+          sudo -Eu builder common/travis/set_mirror.sh &&
+          sudo -Eu builder common/travis/prepare.sh
+
       - name: copy to upstream
         run: cp -rv srcpkgs/* upstream/srcpkgs
 
-      - name: prep masterdir
-        run: |
-          cd upstream &&
-          chown -R builder:builder . &&
-          sudo -Eu builder common/travis/set_mirror.sh &&
-          sudo -Eu builder common/travis/prepare.sh &&
-          cd ..
-
       - name: generate checksum
+        working-directory: upstream
         env:
           CHANGED_PKG: ${{ needs.changedpkgs.outputs.changed }}
         run: |
-          cd upstream &&
-          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }} &&
-          cd ..
+          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
 
       - name: receive relevant copy from upstream
         run: |
