@@ -1,0 +1,16 @@
+{
+  "onboarding": false,
+  "requireConfig": "optional",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)template$/"
+      ],
+      "matchStrings": [
+        "version=(?<currentValue>.*) # renovate: datasource=(?<datasource>.*) depName=(?<depName>.*)"
+      ],
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    }
+  ]
+}

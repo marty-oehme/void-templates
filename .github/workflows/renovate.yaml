@@ -1,0 +1,35 @@
+name: renovate
+on:
+  schedule:
+    - cron: '0 * * * *'
+  push:
+    paths:
+      - '.github/**' # TODO: remove after debugging
+
+env:
+  LOG_LEVEL: 'debug'
+  RENOVATE_AUTODISCOVER: true
+  RENOVATE_AUTODISCOVER_FILTER: '${{ github.repository }}'
+  RENOVATE_PLATFORM: github
+  # RENOVATE_PLATFORM_COMMIT: true
+  # RENOVATE_BOT_NAME: 'breq'
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: renovate package versions
+        uses: renovatebot/github-action@v43.0.1
+        with:
+          configurationFile: .github/renovate.json
+          token: ${{ secrets.RENOVATE_TOKEN }}
+
+
+      - name: Find updated package
+        run: |
+          #!/usr/bin/env bash
+          set -euxo pipefail
+          echo "pkgbuild=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "*template" | head -1 | xargs dirname)" >> $GITHUB_ENV
