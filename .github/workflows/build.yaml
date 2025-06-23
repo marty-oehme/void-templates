@@ -1,13 +1,20 @@
 name: build
 
 on:
-  # TODO: Enable once we have conditional build logic built
-  # pull_request:
-  #   paths:
-  #     - 'srcpkgs/**'
+  pull_request:
+    paths:
+      - "srcpkgs/**"
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
   push:
     paths:
-      - 'srcpkgs/**'
+      - "srcpkgs/**"
+    branches:
+      - main
 
 jobs:
   changedpkgs:
@@ -36,14 +43,20 @@ jobs:
   build:
     name: Build packages
     runs-on: ubuntu-latest
-    needs: [ changedpkgs ]
+    needs: [changedpkgs]
     if: "needs.changedpkgs.outputs.changed != '' && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - { arch: x86_64,       host: x86_64,      libc: glibc, platform: linux/amd64, test: 1 }
+          - {
+              arch: x86_64,
+              host: x86_64,
+              libc: glibc,
+              platform: linux/amd64,
+              test: 1,
+            }
           # - { arch: i686,         host: i686,        libc: glibc, platform: linux/386,   test: 1 }
           # - { arch: aarch64,      host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
           # - { arch: armv7l,       host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
@@ -57,9 +70,9 @@ jobs:
       volumes:
         - /dev:/dev
       env:
-        ARCH: '${{ matrix.config.arch }}'
-        BOOTSTRAP: '${{ matrix.config.host }}'
-        TEST: '${{ matrix.config.test }}'
+        ARCH: "${{ matrix.config.arch }}"
+        BOOTSTRAP: "${{ matrix.config.host }}"
+        TEST: "${{ matrix.config.test }}"
 
     steps:
       - name: Prepare container
@@ -135,7 +148,7 @@ jobs:
   deploy:
     name: Deploy repository
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [build]
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
