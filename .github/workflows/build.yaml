@@ -28,7 +28,7 @@ jobs:
 
       - name: get changed package
         run: |
-          echo "CHANGED_PKG=$(git diff --name-only origin/main ${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
+          echo "CHANGED_PKG=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
 
       - name: checkout upstream templates
         if: ${{ env.CHANGED_PKG != '' }}
