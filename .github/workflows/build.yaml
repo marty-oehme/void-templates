@@ -1,17 +1,53 @@
 name: build
 
 on:
-  # TODO: Enable once we have conditional build logic built
-  # pull_request:
-  #   paths:
-  #     - 'srcpkgs/**'
+  pull_request:
+    paths:
+      - "srcpkgs/**"
+    types:
+      - opened
+      - synchronize
+    branches:
+      - main
   push:
     paths:
-      - 'srcpkgs/**'
+      - "srcpkgs/**"
 
 jobs:
+  checksum:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: get changed package
+        run: |
+          echo "CHANGED_PKG=$(git diff --name-only main ${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
+
+      - name: checkout upstream templates
+        if: ${{ env.CHANGED_PKG != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          ref: master
+          fetch-depth: 1
+          path: distdir
+
+      - name: generate checksum
+        if: ${{ env.CHANGED_PKG != '' }}
+        run: |
+          XBPS_DISTDIR="$PWD/distdir" xgensum -i ${{ env.CHANGED_PKG }}
+
+      - name: Commit
+        if: ${{ env.CHANGED_PKG != '' }}
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          file_pattern: "*/template"
+          commit_message: "Update checksum"
+
   changedpkgs:
     name: Check package changes
+    needs: [checksum]
     runs-on: ubuntu-latest
     if: "!contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
 
@@ -36,14 +72,20 @@ jobs:
   build:
     name: Build packages
     runs-on: ubuntu-latest
-    needs: [ changedpkgs ]
+    needs: [changedpkgs]
     if: "needs.changedpkgs.outputs.changed != '' && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - { arch: x86_64,       host: x86_64,      libc: glibc, platform: linux/amd64, test: 1 }
+          - {
+              arch: x86_64,
+              host: x86_64,
+              libc: glibc,
+              platform: linux/amd64,
+              test: 1,
+            }
           # - { arch: i686,         host: i686,        libc: glibc, platform: linux/386,   test: 1 }
           # - { arch: aarch64,      host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
           # - { arch: armv7l,       host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
@@ -57,9 +99,9 @@ jobs:
       volumes:
         - /dev:/dev
       env:
-        ARCH: '${{ matrix.config.arch }}'
-        BOOTSTRAP: '${{ matrix.config.host }}'
-        TEST: '${{ matrix.config.test }}'
+        ARCH: "${{ matrix.config.arch }}"
+        BOOTSTRAP: "${{ matrix.config.host }}"
+        TEST: "${{ matrix.config.test }}"
 
     steps:
       - name: Prepare container
@@ -135,7 +177,7 @@ jobs:
   deploy:
     name: Deploy repository
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [build]
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
