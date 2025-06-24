@@ -11,7 +11,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="MIT"
 homepage="https://github.com/meowrain/localsend-go"
 distfiles="${homepage}/archive/v${version}.tar.gz"
-checksum=48d6b94b7cbcf6b07400c7293401a0d329e15c6ab1f3493e31363a5525e73b00
+checksum=03ad0ae0fec719ec6425023338c8f4017f78237940c868435f8601addb9e99cd
 
 do_install() {
     vbin ${GOPATH}/bin/cmd localsend_cli
