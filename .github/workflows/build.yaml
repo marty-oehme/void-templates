@@ -67,7 +67,7 @@ jobs:
           # - { arch: aarch64-musl, host: x86_64-musl, libc: musl,  platform: linux/amd64, test: 0 }
 
     container:
-      image: ghcr.io/void-linux/void-${{ matrix.config.libc }}-full:20250227R1
+      image: ghcr.io/void-linux/void-${{ matrix.config.libc }}-full:latest
       options: --platform ${{ matrix.config.platform }} --privileged
       volumes:
         - /dev:/dev
@@ -159,7 +159,7 @@ jobs:
     if: "github.ref == 'refs/heads/main' && ${{ github.event_name != 'workflow_run' }} && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
 
     container:
-      image: ghcr.io/void-linux/void-glibc-full:20250227R1
+      image: ghcr.io/void-linux/void-glibc-full:latest
       options: --privileged
 
     steps:
