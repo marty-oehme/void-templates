@@ -57,7 +57,6 @@ jobs:
 
       - name: cache upstream
         uses: actions/cache@v4
-        id: cache-upstream
         with:
           path: upstream
           key: void-templates-upstream-packages
@@ -71,7 +70,6 @@ jobs:
           path: upstream
 
       - name: prep masterdir
-        if: steps.cache-upstream.outputs.cache-hit != 'true'
         working-directory: upstream
         run: |
           chown -R builder:builder . &&
