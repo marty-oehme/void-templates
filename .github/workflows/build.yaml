@@ -114,7 +114,7 @@ jobs:
       - name: Find changed templates
         env:
           CHANGED: ${{ needs.changedpkgs.outputs.changed }}
-        run: sudo -Eu builder echo "$CHANGED" | sed 's/ /\n/g' > /tmp/templates
+        run: sudo -Eu builder echo "${{ env.CHANGED }}" | sed 's/ /\n/g' > /tmp/templates
 
       - name: Build and check packages
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH" "$TEST"
@@ -127,7 +127,7 @@ jobs:
         env:
           CHANGED: ${{ needs.changedpkgs.outputs.changed }}
         with:
-          name: binaries-${{ CHANGED }}-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
+          name: binaries-${{ env.CHANGED }}-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
           path: |
             hostdir/binpkgs/*.xbps
 
