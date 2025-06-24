@@ -1,6 +1,6 @@
 # Template file for 'git-bug'
 pkgname=git-bug
-version=0.10.0 # renovate: datasource=github-tags depName=git-bug/git-bug
+version=0.10.1 # renovate: datasource=github-tags depName=git-bug/git-bug
 revision=1
 build_style=go
 go_import_path="github.com/git-bug/git-bug"
