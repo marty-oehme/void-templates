@@ -10,5 +10,5 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="MIT"
 homepage="https://github.com/marty-oehme/topen"
 distfiles="${PYPI_SITE}/t/topen/topen-${version}.tar.gz"
-checksum=921847613b5b3c449447646576b72a6635c1e1f511b917432270446b2de14b5d
+checksum=5de0d04db6403d00844508cab095019bba02530b731cc721502c9a8b24f0141f
 make_check=no # don't exec tests, we don't have any
