@@ -1,8 +1,7 @@
-# Template file for 'git-bug-git'
-pkgname=git-bug-git
-version=20241209
-revision=2
-_commit=d499b6e9d3333334614924669b74640a2d0b5485
+# Template file for 'git-bug'
+pkgname=git-bug
+version=0.10.0 # renovate: datasource=github-tags depName=git-bug/git-bug
+revision=1
 build_style=go
 go_import_path="github.com/git-bug/git-bug"
 hostmakedepends="git"
@@ -11,10 +10,9 @@ short_desc="Distributed, offline-first bug tracker embedded in git, with bridges
 maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/git-bug/git-bug"
-distfiles="${homepage}/archive/${_commit}.tar.gz"
+distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
 replaces="git-bug>=0"
-provides="git-bug-${version}_${revision}"
-checksum=b62c4b8145babac282c61e5467b815321eb0008d92df37403ba388432aeca01b
+checksum=84391695b94bd628236cf263e86996c249e390d1a97acc41af21bc7d44346aca
 
 post_install() {
     vlicense LICENSE
@@ -60,11 +58,8 @@ post_install() {
     vman doc/man/git-bug.1
 
     vdoc doc/README.md
-    vdoc doc/architecture.md
-    vdoc doc/cli-convention.md
-    vdoc doc/feature_matrix.md
-    vdoc doc/howto-github.md
-    vdoc doc/jira_bridge.md
-    vdoc doc/model.md
-    vdoc doc/queries.md
+    vdoc doc/usage/interfaces.md
+    vdoc doc/usage/query-language.md
+    vdoc doc/usage/third-party.md
+    vdoc doc/usage/workflows.md
 }
