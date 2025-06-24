@@ -83,7 +83,9 @@ jobs:
 
       - name: generate checksum
         working-directory: upstream
-        run: sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
+        run: |
+          chown -R builder:builder . &&
+          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
 
       - name: receive relevant copy from upstream
         run: |
