@@ -2,9 +2,14 @@ name: Check package updates
 on:
   schedule:
     - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: "Log level"
+        default: "info"
 
 env:
-  LOG_LEVEL: "info"
+  LOG_LEVEL: ${{ github.event.inputs.log-level }}
   RENOVATE_AUTODISCOVER: true
   RENOVATE_AUTODISCOVER_FILTER: "${{ github.repository }}"
   RENOVATE_PLATFORM: github
