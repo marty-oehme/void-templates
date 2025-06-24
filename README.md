@@ -25,7 +25,7 @@ Then all packages herein can be installed.
 - [x] Detect changed packages from previous builds
 - [x] build only for those packages
 - [x] serve from custom repository
-- [ ] detect upstream changes and update templates
+- [x] detect upstream changes and update templates
 - [ ] build for multiple (appropriate) arches
 
 ## Package wishlist
