@@ -200,6 +200,12 @@ jobs:
           xbps-rindex --add $PWD/*.xbps
           xbps-rindex --clean $PWD
 
+      - name: Commit new repo state
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          file_pattern: "*.xbps"
+          commit_message: "Update package repo"
+
       # - name: checksum
       #   run: |
       #     for pkg in *.xbps; do sha256sum "$pkg" | tee "$pkg".sha256sum; done
