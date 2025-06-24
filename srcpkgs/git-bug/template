@@ -1,6 +1,6 @@
 # Template file for 'git-bug'
 pkgname=git-bug
-version=0.10.0 # renovate: datasource=github-tags depName=git-bug/git-bug
+version=0.10.1 # renovate: datasource=github-tags depName=git-bug/git-bug
 revision=1
 build_style=go
 go_import_path="github.com/git-bug/git-bug"
@@ -12,7 +12,7 @@ license="GPL-3.0-only"
 homepage="https://github.com/git-bug/git-bug"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
 replaces="git-bug>=0"
-checksum=84391695b94bd628236cf263e86996c249e390d1a97acc41af21bc7d44346aca
+checksum=1b5cafa3d9918ce18c4674c93b83359e211def83e716d5841fa93c77b457e6c2
 
 post_install() {
     vlicense LICENSE
