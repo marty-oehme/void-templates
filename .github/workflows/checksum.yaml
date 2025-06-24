@@ -1,4 +1,4 @@
-name: PackageUpdate
+name: ChecksumUpdate
 
 on:
   pull_request:

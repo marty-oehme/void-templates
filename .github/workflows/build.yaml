@@ -2,7 +2,7 @@ name: build
 
 on:
   workflow_run:
-    workflows: [PackageUpdate]
+    workflows: [ChecksumUpdate]
     types: [completed]
   push:
     paths:

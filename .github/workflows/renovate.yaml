@@ -1,4 +1,4 @@
-name: renovate
+name: Check package updates
 on:
   schedule:
     - cron: "0 * * * *"
