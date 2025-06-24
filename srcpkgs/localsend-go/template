@@ -3,8 +3,7 @@ pkgname=localsend-go
 version=1.2.7 # renovate: datasource=github-tags depName=meowrain/localsend-go
 revision=2
 build_style=go
-go_import_path="localsend_cli"
-go_package="./cmd"
+go_import_path="github.com/meowrain/localsend-go"
 depends="libcap-progs"
 short_desc="CLI for localsend implemented in Go"
 maintainer="Marty Oehme <contact@martyoeh.me>"
@@ -14,7 +13,7 @@ distfiles="${homepage}/archive/v${version}.tar.gz"
 checksum=03ad0ae0fec719ec6425023338c8f4017f78237940c868435f8601addb9e99cd
 
 do_install() {
-    vbin ${GOPATH}/bin/cmd localsend_cli
+    vbin ${GOPATH}/bin/localsend-go localsend-go
 }
 
 # have to turn it off currently since
