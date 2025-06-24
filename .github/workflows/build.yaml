@@ -199,11 +199,12 @@ jobs:
         run: |
           xbps-rindex --add $PWD/*.xbps
           xbps-rindex --clean $PWD
+          xbps-rindex --remove $PWD
 
       - name: Commit new repo state
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          file_pattern: "*.xbps"
+          file_pattern: "*.xbps *.xbps.sig2"
           commit_message: "Update package repo"
 
       # - name: checksum
