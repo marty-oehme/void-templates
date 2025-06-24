@@ -9,6 +9,14 @@ on:
       - synchronize
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      changed-pkg:
+        description: "Package to checksum"
+        default: ""
+
+env:
+  CHANGED_PKG: ${{ github.event.inputs.changed-pkg }}
 
 jobs:
   checksum:
@@ -41,6 +49,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: remember changed package
+        if: ${{ env.CHANGED_PKG == '' }}
         run: |
           git config --global --add safe.directory $PWD
           echo "CHANGED_PKG=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
@@ -74,7 +83,7 @@ jobs:
 
       - name: generate checksum
         working-directory: upstream
-        run: "sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}"
+        run: sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
 
       - name: receive relevant copy from upstream
         run: |
