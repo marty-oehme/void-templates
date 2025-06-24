@@ -1,6 +1,6 @@
 # Template file for 'bemoji'
 pkgname=bemoji
-version=0.4.0
+version=0.4.0 # renovate: datasource=github-tags depName=marty-oehme/bemoji
 revision=1
 depends="bash coreutils"
 short_desc="emoji picker that remembers your favorites"
