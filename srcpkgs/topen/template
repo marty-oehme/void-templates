@@ -1,6 +1,6 @@
 # Template file for 'topen'
 pkgname=topen
-version=0.1.0 # renovate: datasource=github-tags depName=marty-oehme/topen
+version=0.2.0 # renovate: datasource=github-tags depName=marty-oehme/topen
 revision=1
 build_style=python3-pep517
 depends="python3-tasklib"
