@@ -1,6 +1,6 @@
 # Template file for 'netbird-bin'
 pkgname=netbird-bin
-version=0.48.0 # renovate: datasource=github-tags depName=netbirdio/netbird
+version=0.49.0 # renovate: datasource=github-tags depName=netbirdio/netbird
 revision=1
 archs="x86_64"
 short_desc="Connect your devices into a secure WireGuard-based overlay network with SSO, MFA and granular access controls."
