@@ -6,7 +6,6 @@ on:
       - "srcpkgs/**"
     types:
       - opened
-      - reopened # TODO: For debugging purposes
       - synchronize
     branches:
       - main

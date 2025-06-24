@@ -1,9 +1,11 @@
 name: build
 
 on:
+  # a package changed (usually in PR)
   workflow_run:
     workflows: [ChecksumUpdate]
     types: [completed]
+  # we are integrating updates
   push:
     paths:
       - "srcpkgs/**"
