@@ -96,7 +96,15 @@ jobs:
           ref: master
           fetch-depth: 1
 
+      - name: checkout local templates from prev workflow
+        if: "${{ github.event_name == 'workflow_run' }}"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          path: added-packages
+
       - name: checkout local templates
+        if: "${{ github.event_name != 'workflow_run' }}"
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
