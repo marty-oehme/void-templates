@@ -9,7 +9,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/aandrew-me/tgpt"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum=0e312176908d581eeb7f0df8fcd0524a4aa4702029d50f553f0f75d6c15bc0d9
+checksum=a0fc596fd2b8aabac222e22e96fc02709e185031e31a15b522f4c5c59db892d9
 
 do_check() { :; }
 
