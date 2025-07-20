@@ -8,7 +8,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="BSD-3-Clause"
 homepage="https://github.com/netbirdio/netbird"
 distfiles="${homepage}/releases/download/v${version}/netbird_${version}_linux_amd64.tar.gz"
-checksum=2abdcb63de698366a4dd44238e5dd52334c704833c614986bd93df7e93eeff78
+checksum=abd4e44fe4de003344e2efa39b05b6bfe8a453385348a4a249cd3de6015f615f
 
 do_install() {
     vbin netbird
