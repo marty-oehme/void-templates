@@ -1,6 +1,6 @@
 # Template file for 'tgpt'
 pkgname=tgpt
-version=2.10.1 # renovate: datasource=github-tags depName=aandrew-me/tgpt
+version=2.11.0 # renovate: datasource=github-tags depName=aandrew-me/tgpt
 revision=1
 build_style=go
 go_import_path="github.com/aandrew-me/tgpt/v2"
