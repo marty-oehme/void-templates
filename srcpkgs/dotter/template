@@ -10,7 +10,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="Unlicense"
 homepage="https://github.com/SuperCuber/dotter"
 distfiles="${homepage}/archive/v${version}.tar.gz"
-checksum=4ca78450414f405c892c26b1663cac6e56a86e1d04529a7b1a69b23881c38414
+checksum=46135bcae1940cb22284308bd2cf75d78bb06a748136d835f29db978521fd45a
 
 post_install() {
     vdoc  README.md
