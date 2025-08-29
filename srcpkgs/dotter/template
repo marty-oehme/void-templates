@@ -1,6 +1,6 @@
 # Template file for 'dotter'
 pkgname=dotter
-version=0.13.3 # renovate: datasource=github-tags depName=SuperCuber/dotter
+version=0.13.4 # renovate: datasource=github-tags depName=SuperCuber/dotter
 revision=1
 build_style=cargo
 hostmakedepends="rust"
