@@ -1,0 +1,21 @@
+# Template file for 'zramd'
+pkgname=zramd
+version=0.8.8
+revision=1
+build_style=go
+go_import_path=zramd
+short_desc="Automatically setup swap on zram"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="MIT"
+homepage="https://github.com/M-Gonzalo/zramd"
+changelog="https://github.com/M-Gonzalo/zramd/commits/master/"
+distfiles="https://github.com/M-Gonzalo/zramd/archive/refs/heads/master.tar.gz"
+checksum=c0e0c346d9e6d5a7681a7f219539a3d13aee20a02bbe8157fae12f6c8a4462f5
+
+post_install() {
+	vlicense LICENSE
+
+	vinstall build/package/zramd.default 0644 etc/default zramd
+	vinstall ${FILESDIR}/89-zram-start.sh 0644 etc/runit/core-services
+	vinstall ${FILESDIR}/89-zram-stop.sh 0644 etc/runit/shutdown.d
+}
