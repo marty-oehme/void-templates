@@ -1,11 +1,6 @@
-name: build
+name: Build and Deploy
 
 on:
-  # a package changed (usually in PR)
-  workflow_run:
-    workflows: [ChecksumUpdate]
-    types: [completed]
-  # we are integrating updates
   push:
     paths:
       - "srcpkgs/**"
@@ -13,42 +8,12 @@ on:
       - main
 
 jobs:
-  changedpkgs:
-    name: Check package changes
-    runs-on: ubuntu-latest
-    if: "${{ github.event.workflow_run.conclusion == 'success' }} && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
-
-    outputs:
-      changed: ${{ steps.grabchanged.outputs.changed }}
-
-    steps:
-      - name: checkout local templates from prev workflow
-        if: "${{ github.event_name == 'workflow_run' }}"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.workflow_run.head_branch }}
-
-      - name: checkout local templates
-        if: "${{ github.event_name != 'workflow_run' }}"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - id: grabchanged
-        run: |
-          # write changes to detected_templates
-          .github/changed_templates.sh
-          # move them to step output
-          echo changed="$(cat detected_templates)" >> $GITHUB_OUTPUT
-      - run: |
-          echo "${{ steps.grabchanged.outputs.changed }}"
-
   build:
     name: Build packages
     runs-on: ubuntu-latest
-    needs: [changedpkgs]
-    if: "needs.changedpkgs.outputs.changed != '' && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     strategy:
       fail-fast: false
@@ -59,14 +24,13 @@ jobs:
               host: x86_64,
               libc: glibc,
               platform: linux/amd64,
-              test: 1,
             }
-          # - { arch: i686,         host: i686,        libc: glibc, platform: linux/386,   test: 1 }
-          # - { arch: aarch64,      host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
-          # - { arch: armv7l,       host: x86_64,      libc: glibc, platform: linux/amd64, test: 0 }
-          # - { arch: x86_64-musl,  host: x86_64-musl, libc: musl,  platform: linux/amd64, test: 1 }
-          # - { arch: armv6l-musl,  host: x86_64-musl, libc: musl,  platform: linux/amd64, test: 0 }
-          # - { arch: aarch64-musl, host: x86_64-musl, libc: musl,  platform: linux/amd64, test: 0 }
+          # - { arch: i686,         host: i686,        libc: glibc, platform: linux/386 }
+          # - { arch: aarch64,      host: x86_64,      libc: glibc, platform: linux/amd64 }
+          # - { arch: armv7l,       host: x86_64,      libc: glibc, platform: linux/amd64 }
+          # - { arch: x86_64-musl,  host: x86_64-musl, libc: musl,  platform: linux/amd64 }
+          # - { arch: armv6l-musl,  host: x86_64-musl, libc: musl,  platform: linux/amd64 }
+          # - { arch: aarch64-musl, host: x86_64-musl, libc: musl,  platform: linux/amd64 }
 
     container:
       image: ghcr.io/void-linux/void-${{ matrix.config.libc }}-full:latest
@@ -76,44 +40,30 @@ jobs:
       env:
         ARCH: "${{ matrix.config.arch }}"
         BOOTSTRAP: "${{ matrix.config.host }}"
-        TEST: "${{ matrix.config.test }}"
 
     steps:
       - name: Prepare container
         run: |
-          # switch to repo-ci mirror
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
-          # install dependencies
           xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash curl git
-          # create non-root user
           useradd -G xbuilder -M builder
 
-      - name: checkout upstream templates
+      - name: Checkout upstream templates
         uses: actions/checkout@v4
         with:
           repository: void-linux/void-packages
           ref: master
           fetch-depth: 1
 
-      - name: checkout local templates from prev workflow
-        if: "${{ github.event_name == 'workflow_run' }}"
+      - name: Checkout local templates
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
           path: added-packages
 
-      - name: checkout local templates
-        if: "${{ github.event_name != 'workflow_run' }}"
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          path: added-packages
-
-      - name: copy
+      - name: Copy templates
         run: cp -rv added-packages/srcpkgs/* srcpkgs
 
-        # TODO: Implement cache?
       - name: Prepare masterdir
         run: |
           chown -R builder:builder . &&
@@ -121,43 +71,22 @@ jobs:
           sudo -Eu builder common/travis/prepare.sh &&
           common/travis/fetch-xtools.sh
 
-      - name: Find changed templates
-        env:
-          CHANGED: ${{ needs.changedpkgs.outputs.changed }}
-        run: sudo -Eu builder echo "${{ env.CHANGED }}" | sed 's/ /\n/g' > /tmp/templates
+      - name: Detect changed packages
+        id: detect
+        run: |
+          .github/changed_templates.sh
+          echo "packages=$(cat detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "--- Changed packages ---"
+          cat detected_templates
 
-      - name: Build and check packages
-        run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH" "$TEST"
-
-      - name: Show files
-        run: sudo -Eu builder common/travis/show_files.sh "$BOOTSTRAP" "$ARCH"
+      - name: Build packages
+        run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
 
       - name: Archive xbps artifacts
         uses: actions/upload-artifact@v4
-        env:
-          CHANGED: ${{ needs.changedpkgs.outputs.changed }}
         with:
-          name: binaries-${{ env.CHANGED }}-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
-          path: |
-            hostdir/binpkgs/*.xbps
-
-      # - name: Compare to previous
-      #   run: sudo -Eu builder common/travis/xpkgdiff.sh "$BOOTSTRAP" "$ARCH"
-
-      # - name: Check file conflicts
-      #   if: matrix.config.arch == 'x86_64' # the arch indexed in xlocate
-      #   run: |
-      #     if [ -s /tmp/templates ]; then
-      #         export XDG_CACHE_HOME="$PWD/.cache"
-      #         sudo -Eu builder xlocate -S &&
-      #         sudo -Eu builder common/scripts/lint-conflicts
-      #     fi
-
-      # - name: Verify repository state
-      #   run: |
-      #     mkdir -p /check-install &&
-      #     chown builder:builder /check-install &&
-      #     sudo -Eu builder common/travis/check-install.sh "$BOOTSTRAP" "$ARCH"
+          name: binaries-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
+          path: hostdir/binpkgs/*.xbps
 
   deploy:
     name: Deploy repository
@@ -166,19 +95,12 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
-    if: "github.ref == 'refs/heads/main' && github.event_name != 'workflow_run' && !contains(github.event.pull_request.title, '[ci skip]') && !contains(github.event.pull_request.body, '[ci skip]')"
-
-    container:
-      image: ghcr.io/void-linux/void-glibc-full:latest
-      options: --privileged
 
     steps:
       - name: Prepare container
         run: |
-          # switch to repo-ci mirror
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
-          # install dependencies
           xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash curl git git-lfs
 
       - name: Checkout existing repo
@@ -187,48 +109,41 @@ jobs:
           ref: gh-pages
           lfs: true
 
-      - name: Remove any non-repo files
-        run: |
-          xbps-rindex --remove $PWD
+      - name: Remove existing packages
+        run: xbps-rindex --remove $PWD
 
-      - uses: actions/download-artifact@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
           pattern: binaries-*
           merge-multiple: true
-      - name: Show downloaded files
-        run: ls -R .
 
-      - name: Sign package and repo
+      - name: Sign packages
         run: |
           echo "${{ secrets.PRIV_KEY }}" > $HOME/privkey
           xbps-rindex -s --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD
-          xbps-rindex -S --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD/*.xbps
+          xbps-rindex -S --privkey $HOME/privkey $PWD/*.xbps
           rm $HOME/privkey
 
-      - name: Add package to repo
+      - name: Add packages to repo
         run: |
           xbps-rindex --add $PWD/*.xbps
           xbps-rindex --clean $PWD
           xbps-rindex --remove $PWD
 
-      - name: Commit new repo state
+      - name: Commit repo state
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           file_pattern: "*.xbps *.xbps.sig2"
           commit_message: "Update package repo"
 
-      # - name: checksum
-      #   run: |
-      #     for pkg in *.xbps; do sha256sum "$pkg" | tee "$pkg".sha256sum; done
-      #     for pkg in *.xbps; do sha512sum "$pkg" | tee "$pkg".sha512sum; done
-
-      - name: Create simple index page for repo
+      - name: Create index page
         run: |
           echo '<html><head><title>Custom void repository</title></head> <body><h1>Custom void repository. Index of /</h1><hr><pre>' > index.html
-          for pkg in *.xbps *.xbps.sig2; do echo "<a href=\"${pkg}}\">${pkg}</a>" >> index.html; done
+          for pkg in *.xbps *.xbps.sig2; do echo "<a href=\"${pkg}\">${pkg}</a>" >> index.html; done
           echo '</body></html>' >> index.html
 
-      - name: publish to pages
+      - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
