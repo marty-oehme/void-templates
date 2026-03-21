@@ -79,6 +79,7 @@ jobs:
           common/travis/fetch-xtools.sh
 
       - name: Detect changed packages
+        id: detect
         working-directory: added-packages
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE/added-packages
@@ -93,6 +94,9 @@ jobs:
             echo "--- Changed packages ---"
             cat /tmp/templates
           fi
+          PKG=$(head -1 /tmp/templates)
+          echo "package=$PKG" >> $GITHUB_ENV
+          echo "package=$PKG" >> $GITHUB_OUTPUT
 
       - name: Build packages
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
@@ -100,7 +104,7 @@ jobs:
       - name: Archive xbps artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
+          name: binaries-${{ env.package || 'unknown' }}-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
           path: hostdir/binpkgs/*.xbps
 
   deploy:
