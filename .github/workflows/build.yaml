@@ -79,16 +79,22 @@ jobs:
 
       - name: Detect changed packages
         id: detect
+        working-directory: added-packages
         run: |
           if [ -n "${{ github.event.inputs.package }}" ]; then
-            echo "${{ github.event.inputs.package }}" > detected_templates
+            echo "${{ github.event.inputs.package }}" > /tmp/detected_templates
             echo "Manual package: ${{ github.event.inputs.package }}"
           else
             .github/changed_templates.sh
             echo "--- Changed packages ---"
             cat detected_templates
+            cp detected_templates /tmp/detected_templates
           fi
-          echo "packages=$(cat detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "packages=$(cat /tmp/detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Write package list for build
+        run: |
+          echo "${{ needs.detect.outputs.packages }}" | sed 's/ /\n/g' > /tmp/templates
 
       - name: Build packages
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
