@@ -87,10 +87,12 @@ jobs:
             echo "${{ github.event.inputs.package }}" > /tmp/detected_templates
             echo "Manual package: ${{ github.event.inputs.package }}"
           else
-            .github/changed_templates.sh
+            echo "Detecting packages from commit $GITHUB_SHA"
+            git diff-tree --no-renames -r --name-only --diff-filter=AM \
+              "$GITHUB_SHA~1" "$GITHUB_SHA" -- 'srcpkgs/*/template' \
+              | cut -d/ -f2 | tee /tmp/detected_templates
             echo "--- Changed packages ---"
-            cat detected_templates
-            cp detected_templates /tmp/detected_templates
+            cat /tmp/detected_templates
           fi
           echo "packages=$(cat /tmp/detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
