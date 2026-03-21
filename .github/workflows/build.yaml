@@ -81,6 +81,7 @@ jobs:
         id: detect
         working-directory: added-packages
         run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE/added-packages
           if [ -n "${{ github.event.inputs.package }}" ]; then
             echo "${{ github.event.inputs.package }}" > /tmp/detected_templates
             echo "Manual package: ${{ github.event.inputs.package }}"
