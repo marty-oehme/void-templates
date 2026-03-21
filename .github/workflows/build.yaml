@@ -79,26 +79,20 @@ jobs:
           common/travis/fetch-xtools.sh
 
       - name: Detect changed packages
-        id: detect
         working-directory: added-packages
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE/added-packages
           if [ -n "${{ github.event.inputs.package }}" ]; then
-            echo "${{ github.event.inputs.package }}" > /tmp/detected_templates
+            echo "${{ github.event.inputs.package }}" > /tmp/templates
             echo "Manual package: ${{ github.event.inputs.package }}"
           else
             echo "Detecting packages from commit $GITHUB_SHA"
             git diff-tree --no-renames -r --name-only --diff-filter=AM \
               "$GITHUB_SHA~1" "$GITHUB_SHA" -- 'srcpkgs/*/template' \
-              | cut -d/ -f2 | tee /tmp/detected_templates
+              | cut -d/ -f2 | tee /tmp/templates
             echo "--- Changed packages ---"
-            cat /tmp/detected_templates
+            cat /tmp/templates
           fi
-          echo "packages=$(cat /tmp/detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
-
-      - name: Write package list for build
-        run: |
-          echo "${{ needs.detect.outputs.packages }}" | sed 's/ /\n/g' > /tmp/templates
 
       - name: Build packages
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
