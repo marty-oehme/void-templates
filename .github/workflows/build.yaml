@@ -151,6 +151,10 @@ jobs:
           xbps-rindex --clean $PWD
           xbps-rindex --remove $PWD
 
+      - name: Configure git
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+
       - name: Commit repo state
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
