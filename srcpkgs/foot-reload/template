@@ -1,0 +1,31 @@
+# Template file for 'foot-reload'
+pkgname=foot-reload
+version=20260321
+revision=1
+build_style=meson
+hostmakedepends="pkg-config scdoc wayland-devel"
+makedepends="fcft-devel libutf8proc-devel libxkbcommon-devel ncurses-devel tllist
+ wayland-devel wayland-protocols"
+depends="${pkgname}-terminfo>=${version}_${revision} libutempter virtual?font:monospace"
+short_desc="Fast, lightweight Wayland terminal (color-reload fork)"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="MIT"
+homepage="https://git.martyoeh.me/Marty/foot"
+conflicts="foot>=0"
+provides="foot-${version}_${revision}"
+distfiles="${homepage}/archive/feat/color-reloading.tar.gz"
+checksum=04ed7bdf29722a8f1353a40469b0526948b03b873a05d4420d369e135eb33781
+
+conf_files="/etc/xdg/foot/foot.ini"
+
+post_install() {
+    rm -f ${DESTDIR}/usr/share/doc/foot/LICENSE
+    vlicense LICENSE
+}
+
+foot-reload-terminfo_package() {
+    short_desc+=" - terminfo data"
+    pkg_install() {
+        vmove usr/share/terminfo
+    }
+}
