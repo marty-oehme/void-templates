@@ -1,4 +1,4 @@
-name: ChecksumUpdate
+name: Checksum Update
 
 on:
   pull_request:
@@ -9,18 +9,11 @@ on:
       - synchronize
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      changed-pkg:
-        description: "Package to checksum"
-        default: ""
-
-env:
-  CHANGED_PKG: ${{ github.event.inputs.changed-pkg }}
 
 jobs:
   checksum:
     runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'renovate/')
     container:
       image: ghcr.io/void-linux/void-glibc-full:latest
       options: --platform linux/amd64 --privileged
@@ -29,39 +22,33 @@ jobs:
       env:
         ARCH: x86_64
         BOOTSTRAP: x86_64
-        TEST: 1
 
     steps:
       - name: Prepare container
         run: |
-          # switch to repo-ci mirror
           mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
           sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
-          # install dependencies
           xbps-install -Suy xbps && xbps-install -Suy sudo xtools bash git
-          # create non-root user
           useradd -G xbuilder -M builder
 
-      - name: checkout local templates
+      - name: Checkout local templates
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
-      - name: remember changed package
-        if: ${{ env.CHANGED_PKG == '' }}
+      - name: Detect changed packages
+        id: detect
         run: |
-          git config --global --add safe.directory $PWD
-          echo "CHANGED_PKG=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} "srcpkgs/*/template" | head -1 | cut -d/ -f2)" >> $GITHUB_ENV
-          echo "CHANGED: ${{ env.CHANGED_PKG }}"
+          mkdir -p /tmp/changed-pkgs
+          for file in ${{ github.event.pull_request.changed_files }}; do
+            echo "$file"
+          done | grep 'srcpkgs/.*/template$' | cut -d/ -f2 | sort -u > /tmp/changed-pkgs/packages.txt
+          echo "packages=$(cat /tmp/changed-pkgs/packages.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          echo "--- Detected packages ---"
+          cat /tmp/changed-pkgs/packages.txt
 
-      - name: cache upstream
-        uses: actions/cache@v4
-        with:
-          path: upstream
-          key: void-templates-upstream-packages
-
-      - name: checkout upstream templates
+      - name: Checkout upstream templates
         uses: actions/checkout@v4
         with:
           repository: void-linux/void-packages
@@ -69,28 +56,36 @@ jobs:
           fetch-depth: 1
           path: upstream
 
-      - name: prep masterdir
+      - name: Prepare masterdir
         working-directory: upstream
         run: |
           chown -R builder:builder . &&
           sudo -Eu builder common/travis/set_mirror.sh &&
           sudo -Eu builder common/travis/prepare.sh
 
-      - name: copy to upstream
+      - name: Copy templates to upstream
         run: cp -rv srcpkgs/* upstream/srcpkgs
 
-      - name: generate checksum
+      - name: Generate checksums
         working-directory: upstream
         run: |
-          chown -R builder:builder . &&
-          sudo -Eu builder xgensum -f -i ${{ env.CHANGED_PKG }}
+          sudo -Eu builder xgensum -f -i $(cat /tmp/changed-pkgs/packages.txt | tr '\n' ' ')
 
-      - name: receive relevant copy from upstream
+      - name: Copy updated templates back
         run: |
-          cp -r "upstream/srcpkgs/${{ env.CHANGED_PKG }}" srcpkgs
+          for pkg in $(cat /tmp/changed-pkgs/packages.txt); do
+            cp -r "upstream/srcpkgs/$pkg" srcpkgs/
+          done
 
-      - name: commit new checksum
-        uses: stefanzweifel/git-auto-commit-action@v6
-        with:
-          file_pattern: "srcpkgs/${{ env.CHANGED_PKG }}/template"
-          commit_message: "Update ${{ env.CHANGED_PKG }} checksum"
+      - name: Commit checksum updates
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add srcpkgs/*/template
+          if git diff --staged --quiet; then
+            echo "No checksum changes detected"
+          else
+            git commit -m "Update checksums"
+            git push
+          fi
