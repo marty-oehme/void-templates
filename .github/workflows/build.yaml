@@ -6,6 +6,12 @@ on:
       - "srcpkgs/**"
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to build (leave empty to auto-detect)"
+        required: false
+        default: ""
 
 jobs:
   build:
@@ -74,10 +80,15 @@ jobs:
       - name: Detect changed packages
         id: detect
         run: |
-          .github/changed_templates.sh
+          if [ -n "${{ github.event.inputs.package }}" ]; then
+            echo "${{ github.event.inputs.package }}" > detected_templates
+            echo "Manual package: ${{ github.event.inputs.package }}"
+          else
+            .github/changed_templates.sh
+            echo "--- Changed packages ---"
+            cat detected_templates
+          fi
           echo "packages=$(cat detected_templates | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          echo "--- Changed packages ---"
-          cat detected_templates
 
       - name: Build packages
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
