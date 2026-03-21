@@ -1,0 +1,25 @@
+# Template file for 'tinty'
+pkgname=tinty
+version=0.30.0 # renovate: datasource=github-tags depName=tinted-theming/tinty
+revision=1
+build_style=cargo
+hostmakedepends="rust"
+makedepends="rust-std which"
+short_desc="A base16 and base24 color scheme manager"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="GPL-3.0-only"
+homepage="https://github.com/tinted-theming/tinty"
+distfiles="${homepage}/archive/v${version}.tar.gz"
+checksum=1d507fe779f3a79417fe18e32fec4e052b8bfa5568dd67676c212d70f0b859eb
+
+post_install() {
+    vdoc README.md
+    vlicense LICENSE
+
+    "$PKGDESTDIR"/usr/bin/tinty generate-completion bash > completion.bash
+    "$PKGDESTDIR"/usr/bin/tinty generate-completion zsh > completion.zsh
+    "$PKGDESTDIR"/usr/bin/tinty generate-completion fish > completion.fish
+    vcompletion completion.bash bash
+    vcompletion completion.zsh zsh
+    vcompletion completion.fish fish
+}
