@@ -114,13 +114,14 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
+    container:
+      image: ghcr.io/void-linux/void-glibc-full:latest
+      options: --privileged
 
     steps:
       - name: Prepare container
         run: |
-          mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
-          sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
-          xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash curl git git-lfs
+          xbps-install -Syu && xbps-install -yu && xbps-install -y git git-lfs bash
 
       - name: Checkout existing repo
         uses: actions/checkout@v4
