@@ -32,7 +32,7 @@ jobs:
           useradd -G xbuilder -M builder
 
       - name: Checkout local templates
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
@@ -55,7 +55,7 @@ jobs:
           cat /tmp/changed-pkgs/packages.txt
 
       - name: Checkout upstream templates
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: void-linux/void-packages
           ref: master

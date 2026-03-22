@@ -56,14 +56,14 @@ jobs:
           useradd -G xbuilder -M builder
 
       - name: Checkout upstream templates
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: void-linux/void-packages
           ref: master
           fetch-depth: 1
 
       - name: Checkout local templates
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: added-packages
           fetch-depth: 0
@@ -102,7 +102,7 @@ jobs:
         run: sudo -Eu builder common/travis/build.sh "$BOOTSTRAP" "$ARCH"
 
       - name: Archive xbps artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: binaries-${{ env.package || 'unknown' }}-${{ matrix.config.arch }}-${{ matrix.config.libc }}.xbps
           path: hostdir/binpkgs/*.xbps
@@ -124,7 +124,7 @@ jobs:
           xbps-install -Syu && xbps-install -yu && xbps-install -y git git-lfs bash
 
       - name: Checkout existing repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
           lfs: true
@@ -133,7 +133,7 @@ jobs:
         run: xbps-rindex --remove $PWD
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: binaries-*
           merge-multiple: true
@@ -156,7 +156,7 @@ jobs:
           git config --global --add safe.directory $GITHUB_WORKSPACE
 
       - name: Commit repo state
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           file_pattern: "*.xbps *.xbps.sig2"
           commit_message: "Update package repo"
