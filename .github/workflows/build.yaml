@@ -69,7 +69,7 @@ jobs:
           fetch-depth: 0
 
       - name: Copy templates
-        run: cp -rv added-packages/srcpkgs/* srcpkgs
+        run: cp -av added-packages/srcpkgs/. srcpkgs/
 
       - name: Prepare masterdir
         run: |
