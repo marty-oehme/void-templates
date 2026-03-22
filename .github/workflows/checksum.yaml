@@ -77,7 +77,9 @@ jobs:
       - name: Generate checksums
         working-directory: upstream
         run: |
-          sudo -Eu builder xgensum -f -i $(cat /tmp/changed-pkgs/packages.txt | tr '\n' ' ')
+          for pkg in $(cat /tmp/changed-pkgs/packages.txt); do
+            sudo -Eu builder xgensum -f -i srcpkgs/$pkg/template
+          done
 
       - name: Copy updated templates back
         run: |
