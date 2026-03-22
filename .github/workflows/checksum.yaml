@@ -70,7 +70,9 @@ jobs:
           sudo -Eu builder common/travis/prepare.sh
 
       - name: Copy templates to upstream
-        run: cp -av srcpkgs/. upstream/srcpkgs/
+        run: |
+          cp -av srcpkgs/. upstream/srcpkgs/
+          chown -R builder:builder upstream/srcpkgs/
 
       - name: Generate checksums
         working-directory: upstream
