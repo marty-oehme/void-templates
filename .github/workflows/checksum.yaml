@@ -38,13 +38,19 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Detect changed packages
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            srcpkgs/*/template
+
+      - name: Extract package names
         id: detect
         run: |
           mkdir -p /tmp/changed-pkgs
-          for file in ${{ github.event.pull_request.changed_files }}; do
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file"
-          done | grep 'srcpkgs/.*/template$' | cut -d/ -f2 | sort -u > /tmp/changed-pkgs/packages.txt
-          echo "packages=$(cat /tmp/changed-pkgs/packages.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          done | cut -d/ -f2 | sort -u > /tmp/changed-pkgs/packages.txt
           echo "--- Detected packages ---"
           cat /tmp/changed-pkgs/packages.txt
 
@@ -64,7 +70,7 @@ jobs:
           sudo -Eu builder common/travis/prepare.sh
 
       - name: Copy templates to upstream
-        run: cp -rv srcpkgs/* upstream/srcpkgs
+        run: cp -av srcpkgs/. upstream/srcpkgs/
 
       - name: Generate checksums
         working-directory: upstream
