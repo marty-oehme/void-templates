@@ -28,57 +28,38 @@ Then all packages herein can be installed.
 - [x] detect upstream changes and update templates
 - [ ] build for multiple (appropriate) arches
 
-## Package wishlist
+## What we currently do
+
+- [x] use renovate to open PR whenever new version of a package is released
+- [x] auto-update `template` file `pkgversion` and `checksum`
+- [x] publish new package version to repo once PR has succesfully been merged
+
+## Packages
 
 - [x] bemoji
-- [x] ripgrep-all
-- [x] filtile (bin build only)
 - [x] dotter
+- [x] filtile (window compositor for riverwm)
+- [x] foot-reload (custom foot fork which reloads config on theme change)
 - [x] git-bug
+- [x] localsend-cli (localsend-go)
+- [x] netbird (bin build only. After install, enable service, then run 'netbird up')
+- [x] pass-coffin (plugin for pass to hide metadata, _caution_: untested and barely used)
+- [x] ripgrep-all
+- [x] tgpt
+- [x] tinty
+- [x] topen
+- [x] vimiv-qt
+
+## (Potential) future packages
+
+- [ ] ~~impala~~ (integrated upstream)
 - [ ] bugwarrior - only in pypi for now
 - [ ] viddy / hwatch
-- [x] netbird (bin build only. After install, enable service, then run 'netbird up')
 - [ ] protonvpn / piactl
   - <https://github.com/pia-foss/desktop/issues/59>
-- [ ] taskopen
 - [ ] dstask
 - [ ] tasklite
 - [ ] tu
-- [ ] <https://github.com/nushell/nufmt>
-- [x] tgpt
 
-- [ ] impala (iwd TUI)
-- [ ] localsend:
-
-  - [ ] localsend
-  - [x] localsend-cli (localsend-go)
-
-- gitleaks?
-- syncall - in pypi for now
-
-## Auto updating
-
-Goal: auto-update templates on remote updates (checked e.g. every 24h)
-
-- [ ] use renovate to auto-update `template` file pkgversion
-  - <https://docs.renovatebot.com/user-stories/maintaining-aur-packages-with-renovate>
-- [ ] open PR for new version
-- [ ] For each PR:
-
-  - update checksum for new version
-    - [ ] grab it from correct place if it is published
-    - [ ] default to recalculate checksum for new version files
-    - [ ] auto-commit to PR
-  - [ ] see if file structure changed?
-    - Can't do this here tbh since we need to compare the output of build operation for old and new
-  - [ ] if checksum OK, automatically commit to `main` branch
-
-- [ ] on new `main` addition
-- [ ] complete builds
-
-  - only build for new packages?
-
-- [ ] publish new repo version:
-  - [ ] pull all existing packages in repo into dir
-  - [ ] put new version of the package into repo
-  - [ ] repush repo to page with new file
+Note: If you find a program here that belongs to you and you'd rather not have it hosted in the repo,
+please let me know and I will of course take it down.
