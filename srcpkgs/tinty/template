@@ -1,6 +1,6 @@
 # Template file for 'tinty'
 pkgname=tinty
-version=0.30.0 # renovate: datasource=github-tags depName=tinted-theming/tinty
+version=0.31.0 # renovate: datasource=github-tags depName=tinted-theming/tinty
 revision=1
 build_style=cargo
 hostmakedepends="rust"
