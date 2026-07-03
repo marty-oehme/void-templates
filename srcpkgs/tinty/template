@@ -1,6 +1,6 @@
 # Template file for 'tinty'
 pkgname=tinty
-version=0.33.0 # renovate: datasource=github-tags depName=tinted-theming/tinty
+version=0.34.0 # renovate: datasource=github-tags depName=tinted-theming/tinty
 revision=1
 build_style=cargo
 hostmakedepends="rust"
@@ -10,7 +10,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/tinted-theming/tinty"
 distfiles="${homepage}/archive/v${version}.tar.gz"
-checksum=f4f715ba1b733d2f12f319b2a7202991807015e8876a537ee790c84a4d3e9d07
+checksum=a2738250ebba9a1d998587fb78d644226e0964930ed58eec023ce04ef9c9f4fc
 
 post_install() {
     vdoc README.md
