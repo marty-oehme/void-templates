@@ -1,6 +1,6 @@
 # Template file for 'netbird-bin'
 pkgname=netbird-bin
-version=0.74.2 # renovate: datasource=github-tags depName=netbirdio/netbird
+version=0.74.3 # renovate: datasource=github-tags depName=netbirdio/netbird
 revision=1
 archs="x86_64"
 short_desc="Connect your devices into a secure WireGuard-based overlay network with SSO, MFA and granular access controls."
@@ -8,7 +8,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="BSD-3-Clause"
 homepage="https://github.com/netbirdio/netbird"
 distfiles="${homepage}/releases/download/v${version}/netbird_${version}_linux_amd64.tar.gz"
-checksum=c29f83efbc54c082323857ef99853971703e6230d3d7de9e045fc63cc4ebe135
+checksum=6444b48bebaacce8af0baafdf2907232a94a54d591566dd633a023650cf8daa3
 
 do_install() {
     vbin netbird
