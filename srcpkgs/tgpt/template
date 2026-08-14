@@ -9,7 +9,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/aandrew-me/tgpt"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum=9c6d2e0a7540d24a1f94b9e9ee8b55db4971b5723aec4cfe79a77b46885b4ac5
+checksum=950af3b39f5870d0659c88ae195b46553580e5d96c31f2230b7eb159d774e7b4
 
 do_build() {
     CGO_ENABLED=0 go install -p "$XBPS_MAKEJOBS" -mod="${go_mod_mode}" -modcacherw -trimpath ${go_package}
