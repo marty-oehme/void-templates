@@ -157,9 +157,10 @@ jobs:
       - name: Add packages to repo
         run: |
           xbps-rindex --clean $PWD
-          cp new-binpkgs/*.xbps .
+          cp -a new-binpkgs/. .
           xbps-rindex --add $PWD/*.xbps
           xbps-rindex --remove $PWD
+          rm -rf new-binpkgs
 
       - name: Configure git
         run: |
