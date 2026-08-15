@@ -136,19 +136,29 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: binaries-*
+          path: new-binpkgs
           merge-multiple: true
 
       - name: Sign packages
         run: |
           echo "${{ secrets.PRIV_KEY }}" > $HOME/privkey
           xbps-rindex -s --signedby "${{ secrets.SIGNER }}" --privkey $HOME/privkey $PWD
-          xbps-rindex -S --privkey $HOME/privkey $PWD/*.xbps
+          xbps-rindex -S --privkey $HOME/privkey new-binpkgs/*.xbps
           rm $HOME/privkey
+
+      - name: Remove stale versions of updated packages
+        run: |
+          for f in new-binpkgs/*.xbps; do
+            name=$(basename "$f")
+            pkg="${name%-*}"
+            rm -f "$PWD/${pkg}-"*.xbps*
+          done
 
       - name: Add packages to repo
         run: |
-          xbps-rindex --add $PWD/*.xbps
           xbps-rindex --clean $PWD
+          cp new-binpkgs/*.xbps .
+          xbps-rindex --add $PWD/*.xbps
           xbps-rindex --remove $PWD
 
       - name: Configure git
