@@ -130,7 +130,9 @@ jobs:
           lfs: true
 
       - name: Remove existing packages
-        run: xbps-rindex --remove $PWD
+        run: |
+          xbps-rindex --remove $PWD
+          rm -rf new-binpkgs
 
       - name: Download artifacts
         uses: actions/download-artifact@v8
