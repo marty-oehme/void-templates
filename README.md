@@ -34,6 +34,50 @@ Then all packages herein can be installed.
 - [x] auto-update `template` file `pkgversion` and `checksum`
 - [x] publish new package version to repo once PR has succesfully been merged
 
+## Developing packages locally
+
+The templates live here, but they are built by a normal [void-packages](https://github.com/void-linux/void-packages) checkout. The scripts in `scripts/` copy them into that checkout (`scripts/sync.sh`), so a build always picks up the current state of this repository.
+
+They expect the checkout at `~/.local/share/void-packages`; set `VOID_PACKAGES` if yours lives elsewhere:
+
+```sh
+export VOID_PACKAGES=$HOME/projects/void-packages
+```
+
+All of this has to run on the Void machine itself (xbps-src builds inside a chroot), not inside a container.
+
+### Syncing templates
+
+`scripts/sync.sh [--dry-run] [--force] PKG...` copies `srcpkgs/PKG` to `$VOID_PACKAGES/srcpkgs/PKG`. Without arguments every package is synced. Re-run it after editing a template (or just use `scripts/build.sh`, which does it for you).
+
+- `--dry-run` only prints what would happen.
+- `--remove` deletes the copies again (with arguments only for those packages, without arguments all of them).
+- `--force` also replaces directories that were not copied by this script.
+- Everything synced is recorded in `$VOID_PACKAGES/hostdir/.void-templates-synced`. The directory is not in that manifest is not touched at all: the package already exists upstream, and xbps-src would use that.
+
+Why copying instead of symlinking? xbps-src reads a symlink in `srcpkgs/` as a subpackage reference (like `srcpkgs/foot-reload-terminfo -> foot-reload` in this repository), and the build chroot can only see files below the checkout.
+
+### Checking templates and checksums
+
+`scripts/check.py [--offline] [PKG...]` is a quick pre-flight check, not a replacement for `xlint`. It runs `sh -n`, reads the variables out of the template, checks that the required ones are present and plausible (revision, maintainer format, distfile/checksum counts, …), and then downloads the distfiles (cached in `~/.cache/void-templates/distfiles`) to verify the checksums. `--offline` skips the download. Only problems are printed.
+
+`scripts/checksum.sh [PKG...]` downloads the distfiles and rewrites `checksum=` accordingly, the local equivalent of `xgensum -i`. A deliberate `checksum=skip` is left alone.
+
+### Building and installing
+
+`scripts/build.sh [--install] PKG...` syncs the template(s), runs `xlint` if it happens to be installed, bootstraps the masterdir on first use, and runs `xbps-src pkg`. The package ends up in `$VOID_PACKAGES/hostdir/binpkgs` and is copied to `out/` inside this repository (git-ignored), which is also what gets installed: with `--install` the script indexes `out/` and runs `xbps-install` against it, otherwise it prints that command.
+
+A full cycle for a new package looks like this:
+
+```sh
+mkdir srcpkgs/newpkg
+$EDITOR srcpkgs/newpkg/template
+scripts/checksum.sh newpkg
+scripts/build.sh --install newpkg
+```
+
+When adding additional packages, remember to add the package to the list below, and add a renovate annotation (`# renovate: datasource=... depName=...` on the line above `version=`) if the upstream releases can be tracked automatically.
+
 ## Packages
 
 - [x] bemoji
