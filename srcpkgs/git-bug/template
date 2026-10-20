@@ -1,6 +1,7 @@
 # Template file for 'git-bug'
 pkgname=git-bug
-version=0.11.0 # renovate: datasource=github-tags depName=git-bug/git-bug
+# renovate: datasource=github-tags depName=git-bug/git-bug
+version=0.11.0
 revision=1
 build_style=go
 go_import_path="github.com/git-bug/git-bug"
@@ -15,51 +16,49 @@ replaces="git-bug>=0"
 checksum=31ae65e733e31fbf37ecea8f31966fe46cbeb1657a144876c855d5cf09cffb69
 
 post_install() {
-    vlicense LICENSE
+	vman doc/man/git-bug-bridge-auth-add-token.1
+	vman doc/man/git-bug-bridge-auth-rm.1
+	vman doc/man/git-bug-bridge-auth-show.1
+	vman doc/man/git-bug-bridge-auth.1
+	vman doc/man/git-bug-bridge-new.1
+	vman doc/man/git-bug-bridge-pull.1
+	vman doc/man/git-bug-bridge-push.1
+	vman doc/man/git-bug-bridge-rm.1
+	vman doc/man/git-bug-bridge.1
+	vman doc/man/git-bug-bug-comment-edit.1
+	vman doc/man/git-bug-bug-comment-new.1
+	vman doc/man/git-bug-bug-comment.1
+	vman doc/man/git-bug-bug-deselect.1
+	vman doc/man/git-bug-bug-label-new.1
+	vman doc/man/git-bug-bug-label-rm.1
+	vman doc/man/git-bug-bug-label.1
+	vman doc/man/git-bug-bug-new.1
+	vman doc/man/git-bug-bug-rm.1
+	vman doc/man/git-bug-bug-select.1
+	vman doc/man/git-bug-bug-show.1
+	vman doc/man/git-bug-bug-status-close.1
+	vman doc/man/git-bug-bug-status-open.1
+	vman doc/man/git-bug-bug-status.1
+	vman doc/man/git-bug-bug-title-edit.1
+	vman doc/man/git-bug-bug-title.1
+	vman doc/man/git-bug-bug.1
+	vman doc/man/git-bug-commands.1
+	vman doc/man/git-bug-label.1
+	vman doc/man/git-bug-pull.1
+	vman doc/man/git-bug-push.1
+	vman doc/man/git-bug-termui.1
+	vman doc/man/git-bug-user-adopt.1
+	vman doc/man/git-bug-user-new.1
+	vman doc/man/git-bug-user-user.1
+	vman doc/man/git-bug-user.1
+	vman doc/man/git-bug-version.1
+	vman doc/man/git-bug-webui.1
+	vman doc/man/git-bug-wipe.1
+	vman doc/man/git-bug.1
 
-    vman doc/man/git-bug-bridge-auth-add-token.1
-    vman doc/man/git-bug-bridge-auth-rm.1
-    vman doc/man/git-bug-bridge-auth-show.1
-    vman doc/man/git-bug-bridge-auth.1
-    vman doc/man/git-bug-bridge-new.1
-    vman doc/man/git-bug-bridge-pull.1
-    vman doc/man/git-bug-bridge-push.1
-    vman doc/man/git-bug-bridge-rm.1
-    vman doc/man/git-bug-bridge.1
-    vman doc/man/git-bug-bug-comment-edit.1
-    vman doc/man/git-bug-bug-comment-new.1
-    vman doc/man/git-bug-bug-comment.1
-    vman doc/man/git-bug-bug-deselect.1
-    vman doc/man/git-bug-bug-label-new.1
-    vman doc/man/git-bug-bug-label-rm.1
-    vman doc/man/git-bug-bug-label.1
-    vman doc/man/git-bug-bug-new.1
-    vman doc/man/git-bug-bug-rm.1
-    vman doc/man/git-bug-bug-select.1
-    vman doc/man/git-bug-bug-show.1
-    vman doc/man/git-bug-bug-status-close.1
-    vman doc/man/git-bug-bug-status-open.1
-    vman doc/man/git-bug-bug-status.1
-    vman doc/man/git-bug-bug-title-edit.1
-    vman doc/man/git-bug-bug-title.1
-    vman doc/man/git-bug-bug.1
-    vman doc/man/git-bug-commands.1
-    vman doc/man/git-bug-label.1
-    vman doc/man/git-bug-pull.1
-    vman doc/man/git-bug-push.1
-    vman doc/man/git-bug-termui.1
-    vman doc/man/git-bug-user-adopt.1
-    vman doc/man/git-bug-user-new.1
-    vman doc/man/git-bug-user-user.1
-    vman doc/man/git-bug-user.1
-    vman doc/man/git-bug-version.1
-    vman doc/man/git-bug-webui.1
-    vman doc/man/git-bug-wipe.1
-    vman doc/man/git-bug.1
-
-    vdoc doc/README.md
-    vdoc doc/usage/interfaces.md
-    vdoc doc/usage/query-language.md
-    vdoc doc/usage/third-party.md
-    vdoc doc/usage/workflows.md
+	vdoc doc/README.md
+	vdoc doc/usage/interfaces.md
+	vdoc doc/usage/query-language.md
+	vdoc doc/usage/third-party.md
+	vdoc doc/usage/workflows.md
 }

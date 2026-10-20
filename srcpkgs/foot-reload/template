@@ -11,21 +11,21 @@ short_desc="Fast, lightweight Wayland terminal (color-reload fork)"
 maintainer="Marty Oehme <contact@martyoeh.me>"
 license="MIT"
 homepage="https://git.martyoeh.me/Marty/foot"
-conflicts="foot>=0"
-provides="foot-${version}_${revision}"
 distfiles="${homepage}/archive/feat/color-reloading.tar.gz"
 checksum=9d571f781732c1ad01008757496c26b038081dd2b074b374363711d47901434e
 conf_files="/etc/xdg/foot/foot.ini"
+conflicts="foot>=0"
+provides="foot-${version}_${revision}"
 subpackages="foot-reload-terminfo"
 
 post_install() {
-    rm -f ${DESTDIR}/usr/share/doc/foot/LICENSE
-    vlicense LICENSE
+	rm -f ${DESTDIR}/usr/share/doc/foot/LICENSE
+	vlicense LICENSE
 }
 
 foot-reload-terminfo_package() {
-    short_desc+=" - terminfo data"
-    pkg_install() {
-        vmove usr/share/terminfo
-    }
+	short_desc+=" - terminfo data"
+	pkg_install() {
+		vmove usr/share/terminfo
+	}
 }

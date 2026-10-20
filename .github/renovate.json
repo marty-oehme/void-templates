@@ -8,7 +8,7 @@
         "/(^|/)template$/"
       ],
       "matchStrings": [
-        "version=(?<currentValue>.*) # renovate: datasource=(?<datasource>.*) depName=(?<depName>.*)"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\nversion=(?<currentValue>\\S+)"
       ],
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }

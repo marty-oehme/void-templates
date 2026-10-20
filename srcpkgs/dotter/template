@@ -1,11 +1,12 @@
 # Template file for 'dotter'
 pkgname=dotter
-version=0.13.5 # renovate: datasource=github-tags depName=SuperCuber/dotter
+# renovate: datasource=github-tags depName=SuperCuber/dotter
+version=0.13.5
 revision=1
 build_style=cargo
 hostmakedepends="rust"
 makedepends="rust-std which"
-short_desc="dotfile manager and templater written in rust"
+short_desc="Dotfile manager and templater written in Rust"
 maintainer="Marty Oehme <contact@martyoeh.me>"
 license="Unlicense"
 homepage="https://github.com/SuperCuber/dotter"
@@ -13,13 +14,13 @@ distfiles="${homepage}/archive/v${version}.tar.gz"
 checksum=4ce8550c53db13ddebd683828ee954bf71caed010b3337b291bc5a536aeddc18
 
 post_install() {
-    vdoc  README.md
-    vlicense LICENSE.md
+	vdoc README.md
+	vlicense LICENSE.md
 
-    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell bash > completion.bash
-    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell zsh > completion.zsh
-    "$PKGDESTDIR"/usr/bin/dotter gen-completions --shell fish > completion.fish
-    vcompletion completion.bash bash
-    vcompletion completion.zsh zsh
-    vcompletion completion.fish fish
+	"$PKGDESTDIR"/usr/bin/dotter gen-completions --shell bash > completion.bash
+	"$PKGDESTDIR"/usr/bin/dotter gen-completions --shell zsh > completion.zsh
+	"$PKGDESTDIR"/usr/bin/dotter gen-completions --shell fish > completion.fish
+	vcompletion completion.bash bash
+	vcompletion completion.zsh zsh
+	vcompletion completion.fish fish
 }

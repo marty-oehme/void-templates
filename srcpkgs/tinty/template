@@ -1,11 +1,12 @@
 # Template file for 'tinty'
 pkgname=tinty
-version=0.34.1 # renovate: datasource=github-tags depName=tinted-theming/tinty
+# renovate: datasource=github-tags depName=tinted-theming/tinty
+version=0.34.1
 revision=1
 build_style=cargo
 hostmakedepends="rust"
 makedepends="rust-std which"
-short_desc="A base16 and base24 color scheme manager"
+short_desc="Base16 and base24 color scheme manager"
 maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/tinted-theming/tinty"
@@ -13,13 +14,12 @@ distfiles="${homepage}/archive/v${version}.tar.gz"
 checksum=932c0c6b5c76d6b725ef327fdb71c54976631cc55293c1cd64f30303ace68013
 
 post_install() {
-    vdoc README.md
-    vlicense LICENSE
+	vdoc README.md
 
-    "$PKGDESTDIR"/usr/bin/tinty generate-completion bash > completion.bash
-    "$PKGDESTDIR"/usr/bin/tinty generate-completion zsh > completion.zsh
-    "$PKGDESTDIR"/usr/bin/tinty generate-completion fish > completion.fish
-    vcompletion completion.bash bash
-    vcompletion completion.zsh zsh
-    vcompletion completion.fish fish
+	"$PKGDESTDIR"/usr/bin/tinty generate-completion bash > completion.bash
+	"$PKGDESTDIR"/usr/bin/tinty generate-completion zsh > completion.zsh
+	"$PKGDESTDIR"/usr/bin/tinty generate-completion fish > completion.fish
+	vcompletion completion.bash bash
+	vcompletion completion.zsh zsh
+	vcompletion completion.fish fish
 }

@@ -1,14 +1,19 @@
 # Template file for 'topen'
 pkgname=topen
-version=0.2.0 # renovate: datasource=github-tags depName=marty-oehme/topen
+# renovate: datasource=github-tags depName=marty-oehme/topen
+version=0.2.0
 revision=1
 build_style=python3-pep517
-depends="python3-tasklib"
 hostmakedepends="python3-setuptools"
-short_desc="note editing for taskwarrior tasks"
+depends="python3-tasklib"
+short_desc="Note editing for taskwarrior tasks"
 maintainer="Marty Oehme <contact@martyoeh.me>"
 license="MIT"
 homepage="https://github.com/marty-oehme/topen"
 distfiles="${PYPI_SITE}/t/topen/topen-${version}.tar.gz"
 checksum=5de0d04db6403d00844508cab095019bba02530b731cc721502c9a8b24f0141f
 make_check=no # don't exec tests, we don't have any
+
+post_install() {
+	vlicense LICENSE
+}

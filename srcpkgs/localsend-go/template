@@ -1,6 +1,7 @@
 # Template file for 'localsend-go'
 pkgname=localsend-go
-version=1.2.7 # renovate: datasource=github-tags depName=meowrain/localsend-go
+# renovate: datasource=github-tags depName=meowrain/localsend-go
+version=1.2.7
 revision=2
 build_style=go
 go_import_path="github.com/meowrain/localsend-go"
@@ -13,20 +14,20 @@ distfiles="${homepage}/archive/v${version}.tar.gz"
 checksum=03ad0ae0fec719ec6425023338c8f4017f78237940c868435f8601addb9e99cd
 
 do_install() {
-    vbin ${GOPATH}/bin/localsend-go localsend-go
+	vbin ${GOPATH}/bin/localsend-go localsend-go
 }
 
 # have to turn it off currently since
 # tui_test.go is trying to open a TTY which is not possible.
 # When it _does_ succeed it would just hang there anyway.
 do_check() {
-    :
+	:
 }
 
 post_install() {
-    vlicense LICENSE
+	vlicense LICENSE
 
-    vdoc doc/README_en.md
-    vdoc doc/README_jp.md
-    vdoc doc/README_zh.md
+	vdoc doc/README_en.md
+	vdoc doc/README_jp.md
+	vdoc doc/README_zh.md
 }
