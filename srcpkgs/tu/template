@@ -1,0 +1,17 @@
+# Template file for 'tu'
+pkgname=tu
+# renovate: datasource=github-tags depName=ad-si/tu
+version=0.4.0
+revision=1
+build_style=cargo
+short_desc="Convert natural language date and time strings to UTC"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="ISC"
+homepage="https://github.com/ad-si/tu"
+distfiles="${homepage}/archive/v${version}.tar.gz"
+checksum=d1ace3ef99327ce5efa42f04f83734bb5414d59f4daf4f41afe082c903035675
+
+post_install() {
+	# v0.4.0 tarball has no LICENSE file (it was added upstream afterwards)
+	vlicense "${FILESDIR}/LICENSE"
+}

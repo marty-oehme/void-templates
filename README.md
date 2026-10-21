@@ -93,18 +93,15 @@ When adding additional packages, remember to add the package to the list below, 
 - [x] tgpt
 - [x] tinty
 - [x] topen
+- [x] tu (convert natural language date/time strings to UTC)
 - [x] vimiv-qt
 
 ## (Potential) future packages
 
-- [ ] ~~impala~~ (integrated upstream)
 - [ ] bugwarrior - only in pypi for now
 - [ ] viddy / hwatch
-- [ ] protonvpn / piactl (open-source client; the official client is now packaged as `piavpn-bin`)
-  - <https://github.com/pia-foss/desktop/issues/59>
 - [ ] dstask
 - [ ] tasklite
-- [ ] tu
 
 Note: If you find a program here that belongs to you and you'd rather not have it hosted in the repo,
 please let me know and I will of course take it down.
