@@ -1,0 +1,7 @@
+case "${ACTION}" in
+post)
+	groupadd -r piavpn 2>/dev/null || true
+	groupadd -r piahnsd 2>/dev/null || true
+	setcap 'cap_net_bind_service=+ep' /opt/piavpn/bin/pia-unbound
+	;;
+esac

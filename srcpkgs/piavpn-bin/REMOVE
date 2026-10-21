@@ -1,0 +1,6 @@
+case "${ACTION}" in
+purge)
+	groupdel piavpn 2>/dev/null || true
+	groupdel piahnsd 2>/dev/null || true
+	;;
+esac

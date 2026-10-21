@@ -88,6 +88,7 @@ When adding additional packages, remember to add the package to the list below, 
 - [x] localsend-cli (localsend-go)
 - [x] netbird (bin build only. After install, enable service, then run 'netbird up')
 - [x] pass-coffin (plugin for pass to hide metadata, _caution_: untested and barely used)
+- [x] piavpn-bin (Private Internet Access VPN client + daemon, repacked from the official installer. Service is installed as `piavpn` but not enabled: `sv up piavpn`. See INSTALL.msg on upgrade notes)
 - [x] ripgrep-all
 - [x] tgpt
 - [x] tinty
@@ -99,7 +100,7 @@ When adding additional packages, remember to add the package to the list below, 
 - [ ] ~~impala~~ (integrated upstream)
 - [ ] bugwarrior - only in pypi for now
 - [ ] viddy / hwatch
-- [ ] protonvpn / piactl
+- [ ] protonvpn / piactl (open-source client; the official client is now packaged as `piavpn-bin`)
   - <https://github.com/pia-foss/desktop/issues/59>
 - [ ] dstask
 - [ ] tasklite

@@ -1,0 +1,66 @@
+# Template file for 'piavpn-bin'
+pkgname=piavpn-bin
+# version is <upstream version>+<build number>; the installer filename drops
+# the trailing .0 of upstream's package.txt version (3.8.0+08539 -> 3.8-08539).
+# Bumps are manual: https://www.privateinternetaccess.com/pages/changelog
+version=3.8+08539
+revision=1
+archs="x86_64"
+depends="iptables libICE libSM libXau libXdmcp libbsd libcap-ng libmd libuuid psmisc zlib"
+short_desc="Private Internet Access VPN client and daemon"
+maintainer="Marty Oehme <contact@martyoeh.me>"
+license="GPL-3.0-or-later"
+homepage="https://www.privateinternetaccess.com/"
+distfiles="https://installers.privateinternetaccess.com/download/pia-linux-${version%+*}-${version##*+}.run"
+checksum=a3cf2e2b50d29693ba58f0ae232e52c5785f0244a56e6ed005b684b18767399f
+noshlibprovides=yes
+noverifyrdeps=yes
+# prebuilt vendor bundle: never touch the shipped binaries (this also skips the
+# PIE audit, which upstream's binaries fail since we cannot rebuild them)
+nostrip=yes
+conf_files="/etc/NetworkManager/conf.d/wgpia.conf"
+
+do_extract() {
+	# The installer is a makeself archive: a shell stub followed by a gzip'd
+	# tarball (its length is recorded as filesizes= in the stub). The stub's
+	# own extractor needs GNU tar, which the xbps-src masterdir does not ship
+	# (it provides bsdtar), so strip the stub and unpack the payload directly.
+	local distfile="$XBPS_SRCDISTDIR/$pkgname-$version/${distfiles##*/}"
+	local paylen tarcmd
+
+	paylen="$(head -c 65536 "$distfile" | sed -n 's/^filesizes="\([^"]*\)".*/\1/p' | head -n1 |
+		awk '{ for (i = 1; i <= NF; i++) s += $i } END { print s }')"
+	if [ -z "$paylen" ] || [ "$paylen" -eq 0 ]; then
+		msg_error "$pkgver: can't parse the payload size from ${distfiles##*/}"
+	fi
+
+	tarcmd="$(command -v bsdtar)"
+	[ -z "$tarcmd" ] && tarcmd="$(command -v tar)"
+	[ -n "$tarcmd" ] || msg_error "$pkgver: neither bsdtar nor tar found"
+	# the stub's MS_Decompress hardcodes gzip -cd, the payload is always gzip
+	tail -c "$paylen" "$distfile" | gzip -dc | "$tarcmd" -xpf - -C "$wrksrc"
+}
+
+do_install() {
+	# keep upstream's /opt/piavpn layout: qt.conf, the desktop file and the
+	# service hardcode it, and the binaries resolve bundled libs via $ORIGIN
+	vmkdir opt/piavpn
+	vcopy "piafiles/*" opt/piavpn
+
+	# upstream installs its helper scripts next to the binaries
+	local f
+	for f in installfiles/*.sh; do
+		vinstall "$f" 755 opt/piavpn/bin
+	done
+	chmod 755 ${DESTDIR}/opt/piavpn/bin/*.sh
+
+	vinstall installfiles/piavpn.desktop 644 usr/share/applications
+	vinstall installfiles/app-icon.png 644 usr/share/pixmaps piavpn.png
+	vinstall ${FILESDIR}/wgpia.conf 644 etc/NetworkManager/conf.d
+
+	# upstream symlinks into /usr/local/bin; Void policy is /usr/bin
+	vmkdir usr/bin
+	ln -s /opt/piavpn/bin/piactl ${DESTDIR}/usr/bin/piactl
+
+	vsv piavpn
+}
