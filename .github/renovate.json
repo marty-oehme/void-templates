@@ -12,5 +12,22 @@
       ],
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
+  ],
+  "customDatasources": {
+    "pia": {
+      "defaultRegistryUrlTemplate": "https://www.privateinternetaccess.com/pages/changelog",
+      "format": "html",
+      "transformTemplates": [
+        "{\"releases\": $distinct($$.releases[$match(version, /\\/pia-linux-[0-9.]+-[0-9]+\\.run$/)].{\"version\": $join($split($substringAfter($substringBefore($substringAfter(version, \"/download/\"), \".run\"), \"pia-linux-\"), \"-\"), \"+\")}), \"changelogUrl\": \"https://www.privateinternetaccess.com/pages/changelog\"}"
+      ]
+    }
+  },
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "custom.pia"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)(?:\\.(?<patch>\\d+))?\\+(?<build>\\d+)$"
+    }
   ]
 }

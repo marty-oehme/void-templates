@@ -2,7 +2,7 @@
 pkgname=piavpn-bin
 # version is <upstream version>+<build number>; the installer filename drops
 # the trailing .0 of upstream's package.txt version (3.8.0+08539 -> 3.8-08539).
-# Bumps are manual: https://www.privateinternetaccess.com/pages/changelog
+# renovate: datasource=custom.pia depName=piavpn
 version=3.8+08539
 revision=1
 archs="x86_64"
