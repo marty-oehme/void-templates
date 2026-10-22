@@ -11,7 +11,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/tinted-theming/tinty"
 distfiles="${homepage}/archive/v${version}.tar.gz"
-checksum=932c0c6b5c76d6b725ef327fdb71c54976631cc55293c1cd64f30303ace68013
+checksum=136e13b94ba1a0fbbb7b1aa1e48b70b94ed9f2a45f4abc81937cabe1c819f860
 
 post_install() {
 	vdoc README.md
