@@ -1,7 +1,7 @@
 # Template file for 'tgpt'
 pkgname=tgpt
 # renovate: datasource=github-tags depName=aandrew-me/tgpt
-version=2.14.0
+version=2.15.0
 revision=1
 build_style=go
 go_import_path="github.com/aandrew-me/tgpt/v2"
@@ -10,7 +10,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/aandrew-me/tgpt"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum=2dd4e1e5c51243e2a373eebaaf85441f4d418def0a962325ff6784bed2aa874d
+checksum=208f8d96ef1b1af85c765d3dde45842fd7df18936fb4e121d52538d0da1be032
 
 do_build() {
 	CGO_ENABLED=0 go install -p "$XBPS_MAKEJOBS" -mod="${go_mod_mode}" -modcacherw -trimpath ${go_package}
