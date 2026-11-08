@@ -12,7 +12,7 @@ maintainer="Marty Oehme <contact@martyoeh.me>"
 license="GPL-3.0-only"
 homepage="https://github.com/git-bug/git-bug"
 distfiles="${homepage}/archive/refs/tags/v${version}.tar.gz"
-checksum=31ae65e733e31fbf37ecea8f31966fe46cbeb1657a144876c855d5cf09cffb69
+checksum=d02f75b5ca4a6ab7d8cd0bf028cee8f090ccd7f07854b5edeb4953957b75e39a
 replaces="git-bug>=0"
 
 post_install() {
