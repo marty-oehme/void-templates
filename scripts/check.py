@@ -5,7 +5,7 @@ This is deliberately *not* xlint: xlint needs a full void-packages checkout
 and knows more about packaging policy. These checks catch the mistakes that
 are cheap to catch while a template is being written:
 
-    * POSIX sh syntax of the template
+    * shell syntax of the template (checked with bash when available)
     * presence and shape of the required variables
     * distfile URLs that can be fetched, and checksums that match them
     * optionally rewriting checksum= from the current distfiles
@@ -34,8 +34,14 @@ from pathlib import Path
 REPO_DIR = Path(__file__).resolve().parent.parent
 SRCPKGS_DIR = REPO_DIR / "srcpkgs"
 
+# xbps-src sources templates with bash, and Void's subpackage convention
+# allows hyphens in function names (foot-reload-terminfo_package), which dash
+# rejects. Prefer bash so we check what actually runs; fall back to sh where
+# bash is not installed.
+SHELL = shutil.which("bash") or "sh"
+
 # Variables the template is expected to set; we read them by sourcing the
-# template in a POSIX shell, exactly like xbps-src does.
+# template in that shell, exactly like xbps-src does.
 WANTED_VARS = (
     "pkgname",
     "version",
@@ -91,9 +97,12 @@ class PackageResult:
 def load_template(path):
     """Return (variables, error). Sourcing is safe: templates only define
     variables and functions, nothing runs at top level."""
-    syntax = subprocess.run(["sh", "-n", str(path)], capture_output=True, text=True)
+    syntax = subprocess.run([SHELL, "-n", str(path)], capture_output=True, text=True)
     if syntax.returncode != 0:
-        return None, syntax.stderr.strip() or "shell syntax error"
+        message = syntax.stderr.strip() or "shell syntax error"
+        if SHELL == "sh":
+            message += " (checked with sh; install bash for an accurate result)"
+        return None, message
 
     # xbps-src defines the *_SITE variables before sourcing a template, so the
     # template's distfiles=... is expanded at assignment time. Do the same,
@@ -105,7 +114,7 @@ def load_template(path):
         + "".join("printf '%%s\\0' \"${%s-}\"\n" % name for name in WANTED_VARS)
     )
     proc = subprocess.run(
-        ["sh", "-c", dumper, "sh", str(path)], capture_output=True
+        [SHELL, "-c", dumper, SHELL, str(path)], capture_output=True
     )
     if proc.returncode != 0:
         return None, proc.stderr.decode(errors="replace").strip() or "could not read template"
