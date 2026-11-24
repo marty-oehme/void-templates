@@ -2,7 +2,7 @@
 pkgname=localsend-go
 # renovate: datasource=github-tags depName=meowrain/localsend-go
 version=1.3.0
-revision=1
+revision=2
 build_style=go
 go_import_path="github.com/meowrain/localsend-go"
 depends="libcap-progs"
