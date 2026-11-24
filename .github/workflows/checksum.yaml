@@ -36,6 +36,8 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
+          # Push with RENOVATE_TOKEN: commits pushed with GITHUB_TOKEN do not trigger other workflows.
+          token: ${{ secrets.RENOVATE_TOKEN }}
 
       - name: Detect changed packages
         id: changed-files
