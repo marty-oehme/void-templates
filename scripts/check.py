@@ -10,9 +10,11 @@ are cheap to catch while a template is being written:
     * distfile URLs that can be fetched, and checksums that match them
     * optionally rewriting checksum= from the current distfiles
       (--write-checksums, the local equivalent of `xgensum -i`)
+    * the version/revision policy against a base revision (--base REF), so
+      that clients actually see the rebuilt package
 
 Usage:
-    scripts/check.py [--offline] [--write-checksums] [PKG...]
+    scripts/check.py [--offline] [--write-checksums] [--base REF] [PKG...]
 
 Exit status is 0 when no errors were found; warnings do not fail the run.
 """
@@ -62,6 +64,10 @@ SITE_VARS = {
 USER_AGENT = "void-templates-check/1.0 (+https://github.com/marty-oehme/void-templates)"
 CHECKSUM_RE = re.compile(r"^[0-9a-f]{64}$")
 VAR_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)")
+# Strict single-line patterns for the base template: it is untrusted, so it is
+# never sourced, only these values are read out of it.
+BASE_VERSION_RE = re.compile(r"^version=(.*)$", re.MULTILINE)
+BASE_REVISION_RE = re.compile(r"^revision=(.*)$", re.MULTILINE)
 
 
 class PackageResult:
@@ -206,7 +212,120 @@ def rewrite_checksum(path, hashes):
     path.write_text("".join(lines))
 
 
-def check_package(name, offline, write_checksums):
+def git(*args):
+    return subprocess.run(
+        ["git", "-C", str(REPO_DIR), *args], capture_output=True, text=True
+    )
+
+
+def package_paths(name):
+    """Return the srcpkgs paths that make up a package, following symlinks.
+
+    git does not resolve symlinks in tree paths, so `srcpkgs/X/template` fails
+    when X links to another package. Both the entry and its target are returned.
+    """
+    paths = [f"srcpkgs/{name}"]
+    resolved = (SRCPKGS_DIR / name).resolve()
+    try:
+        relative = resolved.relative_to(SRCPKGS_DIR.resolve())
+    except ValueError:
+        return paths
+    if len(relative.parts) == 1:
+        target = f"srcpkgs/{relative.parts[0]}"
+        if target not in paths:
+            paths.append(target)
+    return paths
+
+
+def parse_base_template(text):
+    """Read only version and revision from a base template.
+
+    The base text is untrusted: it is never sourced. revision defaults to 1,
+    which is what xbps-src assumes when a template does not set it.
+    """
+    def value(pattern, default=""):
+        match = pattern.search(text)
+        if not match:
+            return default
+        found = match.group(1).strip()
+        if len(found) >= 2 and found[0] == found[-1] and found[0] in "'\"":
+            found = found[1:-1].strip()
+        return found
+
+    return {
+        "version": value(BASE_VERSION_RE),
+        "revision": value(BASE_REVISION_RE, "1"),
+    }
+
+
+class BaseRevision:
+    """A git commit the working tree is compared against (--base)."""
+
+    def __init__(self, ref, commit):
+        self.ref = ref
+        self.commit = commit
+
+    def template(self, name):
+        """Return the base template text, or None if the package is new."""
+        for path in package_paths(name):
+            proc = git("show", f"{self.commit}:{path}/template")
+            if proc.returncode == 0:
+                return proc.stdout
+        return None
+
+    def changed(self, name):
+        """Return whether the package differs from base, or None if unknown."""
+        paths = package_paths(name)
+        diff = git("diff", "--name-only", self.commit, "--", *paths)
+        if diff.returncode != 0:
+            return None
+        untracked = git("ls-files", "--others", "--exclude-standard", "--", *paths)
+        return bool(diff.stdout.strip() or untracked.stdout.strip())
+
+
+def check_policy(result, name, version, revision, base):
+    """Enforce xbps' version/revision policy against a base revision.
+
+    A new version resets revision to 1; changing a package without a version
+    bump needs a higher revision, or clients keep the binary they have.
+    """
+    text = base.template(name)
+    if text is None:
+        return
+
+    old = parse_base_template(text)
+    old_version = old["version"]
+    old_revision = (
+        int(old["revision"]) if re.fullmatch(r"[1-9][0-9]*", old["revision"]) else 1
+    )
+
+    if version != old_version:
+        if revision != 1:
+            result.error(
+                f"version changed from {old_version or '<unset>'} to {version}, "
+                f"so revision must be 1 (found {revision})"
+            )
+        return
+
+    changed = base.changed(name)
+    if changed is None:
+        result.warn(
+            f"could not determine files changed since {base.ref}; "
+            "revision policy not checked"
+        )
+        return
+    if not changed:
+        return
+    if revision < old_revision:
+        result.error(f"revision went backwards from {old_revision} to {revision}")
+    elif revision == old_revision:
+        result.error(
+            f"files changed since {base.ref} without a revision bump "
+            f"(still {revision}); bump revision to {revision + 1}"
+        )
+
+
+def check_package(name, offline, write_checksums, base=None):
     result = PackageResult(name)
     path = SRCPKGS_DIR / name / "template"
 
@@ -251,6 +370,8 @@ def check_package(name, offline, write_checksums):
         result.error("revision is not set")
     elif not re.fullmatch(r"[1-9][0-9]*", revision):
         result.error(f"revision={revision!r} is not a positive integer")
+    elif base is not None and version:
+        check_policy(result, name, version, int(revision), base)
 
     short_desc = values["short_desc"].strip()
     if not short_desc:
@@ -377,11 +498,31 @@ def main(argv):
         action="store_true",
         help="rewrite checksum= from the downloaded distfiles (like `xgensum -i`)",
     )
+    parser.add_argument(
+        "--base",
+        metavar="REF",
+        default=None,
+        help="git revision to compare version/revision policy against",
+    )
     parser.add_argument("packages", nargs="*", metavar="PKG", help="package(s) to check")
     args = parser.parse_args(argv)
 
     if args.write_checksums and args.offline:
         parser.error("--write-checksums needs network access; do not combine it with --offline")
+
+    base = None
+    if args.base is not None:
+        ref = args.base.strip()
+        if not ref:
+            print("No base revision given, skipping version/revision policy checks")
+        elif re.fullmatch(r"0+", ref):
+            print(f"Base revision {ref} is all zeros, skipping version/revision policy checks")
+        else:
+            proc = git("rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")
+            commit = proc.stdout.strip()
+            if proc.returncode != 0 or not commit:
+                parser.error(f"cannot resolve --base {ref!r} to a commit")
+            base = BaseRevision(ref, commit)
 
     if args.packages:
         names = args.packages
@@ -395,7 +536,9 @@ def main(argv):
             if entry.is_dir() or (entry.is_symlink() and entry.exists())
         )
 
-    results = [check_package(name, args.offline, args.write_checksums) for name in names]
+    results = [
+        check_package(name, args.offline, args.write_checksums, base) for name in names
+    ]
 
     failed = 0
     warned = 0
