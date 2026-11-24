@@ -18,10 +18,15 @@ on:
         required: false
         default: ""
 
+env:
+  # void-packages is pinned so CI does not move under us; bump after testing.
+  # Last bumped: 2026-11-24.
+  VOID_PACKAGES_REF: 6427b98fd6f7739bc187cd94fd2f641e0b939f78
+
 jobs:
   policy:
     name: Check version/revision policy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout local templates
         uses: actions/checkout@v6
@@ -35,7 +40,7 @@ jobs:
 
   build:
     name: Build packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # PR runs get their own group so they can never cancel a main build/deploy.
     concurrency:
       group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -47,11 +52,15 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          # The image digest is pinned deliberately: bump it manually to adopt a
+          # newer void-glibc-full. Commented-out matrix entries would each need
+          # their own image.
           - {
               arch: x86_64,
               host: x86_64,
               libc: glibc,
               platform: linux/amd64,
+              image: ghcr.io/void-linux/void-glibc-full:latest@sha256:e98f8cdde9e6ca85f8542fad5cdd06032a05dca3bf2b81757949bb24d67afa37,
             }
           # - { arch: i686,         host: i686,        libc: glibc, platform: linux/386 }
           # - { arch: aarch64,      host: x86_64,      libc: glibc, platform: linux/amd64 }
@@ -61,7 +70,7 @@ jobs:
           # - { arch: aarch64-musl, host: x86_64-musl, libc: musl,  platform: linux/amd64 }
 
     container:
-      image: ghcr.io/void-linux/void-${{ matrix.config.libc }}-full:latest
+      image: ${{ matrix.config.image }}
       options: --platform ${{ matrix.config.platform }} --privileged
       volumes:
         - /dev:/dev
@@ -81,7 +90,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: void-linux/void-packages
-          ref: master
+          ref: ${{ env.VOID_PACKAGES_REF }}
           fetch-depth: 1
 
       - name: Checkout local templates
@@ -191,7 +200,7 @@ jobs:
 
   deploy:
     name: Deploy repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build]
     # Deploy only from main, never from pull_request, and only when something was built.
     if: "needs.build.outputs.count != '0' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')"
@@ -199,7 +208,8 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}-deployment
       cancel-in-progress: false
     container:
-      image: ghcr.io/void-linux/void-glibc-full:latest
+      # Digest pinned deliberately; bump it manually to update the image.
+      image: ghcr.io/void-linux/void-glibc-full:latest@sha256:e98f8cdde9e6ca85f8542fad5cdd06032a05dca3bf2b81757949bb24d67afa37
       options: --privileged
 
     steps:

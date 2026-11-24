@@ -10,12 +10,18 @@ on:
     branches:
       - main
 
+env:
+  # void-packages is pinned so CI does not move under us; bump after testing.
+  # Last bumped: 2026-11-24.
+  VOID_PACKAGES_REF: 6427b98fd6f7739bc187cd94fd2f641e0b939f78
+
 jobs:
   checksum:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: startsWith(github.head_ref, 'renovate/')
     container:
-      image: ghcr.io/void-linux/void-glibc-full:latest
+      # Digest pinned deliberately; bump it manually to update the image.
+      image: ghcr.io/void-linux/void-glibc-full:latest@sha256:e98f8cdde9e6ca85f8542fad5cdd06032a05dca3bf2b81757949bb24d67afa37
       options: --platform linux/amd64 --privileged
       volumes:
         - /dev:/dev
@@ -41,7 +47,7 @@ jobs:
 
       - name: Detect changed packages
         id: changed-files
-        uses: tj-actions/changed-files@v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             srcpkgs/*/template
@@ -60,7 +66,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: void-linux/void-packages
-          ref: master
+          ref: ${{ env.VOID_PACKAGES_REF }}
           fetch-depth: 1
           path: upstream
 

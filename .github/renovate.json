@@ -1,6 +1,10 @@
 {
   "onboarding": false,
   "requireConfig": "optional",
+  "extends": [
+    "helpers:pinGitHubActionDigests"
+  ],
+  "minimumReleaseAge": "3 days",
   "customManagers": [
     {
       "customType": "regex",
