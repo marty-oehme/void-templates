@@ -3,3 +3,5 @@ post)
 	setcap cap_net_raw+ep /usr/bin/localsend-go
 	;;
 esac
+
+# ci-test: file change without revision bump
